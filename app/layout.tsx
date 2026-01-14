@@ -1,7 +1,7 @@
 import '@/lib/styles/globals.css'
 
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Space_Grotesk, DM_Sans } from 'next/font/google'
 
 import { GlobalProviders } from './components/global-providers/global-providers'
 
@@ -12,9 +12,16 @@ export const metadata: Metadata = {
   },
 }
 
-const inter = Inter({
+const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
-  weight: ['400', '600', '700'],
+  variable: '--font-heading',
+  display: 'swap',
+})
+
+const dmSans = DM_Sans({
+  subsets: ['latin'],
+  variable: '--font-body',
+  display: 'swap',
 })
 
 const RootLayout = async (properties: React.PropsWithChildren) => {
@@ -22,7 +29,7 @@ const RootLayout = async (properties: React.PropsWithChildren) => {
   return (
     <html lang='en' suppressHydrationWarning>
       <head />
-      <body className={inter.className}>
+      <body className={`${spaceGrotesk.variable} ${dmSans.variable} font-body antialiased`}>
         <GlobalProviders>
           <div className='min-h-screen'>
             <main>{children}</main>

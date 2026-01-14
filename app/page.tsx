@@ -15,25 +15,24 @@ const HomePage = () => {
   const boards = getBoards()
 
   return (
-    <section className='min-h-screen bg-background px-6 py-10 sm:px-10'>
+    <section className='min-h-screen bg-background px-6 py-12 sm:px-10'>
       <div className='mx-auto flex w-full max-w-6xl flex-col gap-8'>
         <header className='space-y-4'>
-          <div className='flex items-center gap-2 text-sm text-muted-foreground'>
+          <div className='flex items-center gap-2 text-sm font-medium text-muted-foreground'>
             <LayoutGrid className='size-4' />
             <span>Your Boards</span>
           </div>
           <div className='space-y-2'>
-            <h1 className='text-3xl font-semibold sm:text-4xl'>
-              Welcome to Task Board
+            <h1 className='text-4xl font-bold tracking-tight sm:text-5xl'>
+              Task Board
             </h1>
-            <p className='max-w-2xl text-sm text-muted-foreground'>
-              Select a board to view and manage your tasks with drag-and-drop
-              kanban columns.
+            <p className='max-w-2xl text-muted-foreground'>
+              Organize your projects with kanban boards.
             </p>
           </div>
         </header>
 
-        <div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-2'>
+        <div className='grid gap-4 sm:grid-cols-2'>
           {boards.map((board) => {
             const taskCount = countBoardTasks(board)
             return (
@@ -42,15 +41,15 @@ const HomePage = () => {
                 href={`/boards/${board.id}`}
                 className='group'
               >
-                <Card className='border-border/60 bg-card/80 transition hover:border-foreground/20 hover:shadow-md'>
-                  <CardHeader className='space-y-3'>
+                <Card className='border border-border bg-card transition-colors hover:border-primary/50 hover:bg-muted/30'>
+                  <CardHeader className='space-y-3 pb-3'>
                     <div className='flex items-start justify-between'>
-                      <Badge variant='outline' className='w-fit'>
+                      <Badge variant='outline' className='text-xs font-medium'>
                         Board
                       </Badge>
-                      <ArrowRight className='size-4 text-muted-foreground transition group-hover:translate-x-1 group-hover:text-foreground' />
+                      <ArrowRight className='size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5' />
                     </div>
-                    <CardTitle className='text-xl group-hover:text-foreground'>
+                    <CardTitle className='text-xl font-bold tracking-tight'>
                       {board.name}
                     </CardTitle>
                   </CardHeader>
@@ -59,16 +58,12 @@ const HomePage = () => {
                       {board.description}
                     </p>
                     <div className='flex items-center gap-4 text-xs text-muted-foreground'>
-                      <div className='flex items-center gap-2'>
-                        <Badge variant='secondary' className='h-5 min-w-5 px-1.5'>
-                          {board.columns.length}
-                        </Badge>
+                      <div className='flex items-center gap-1.5'>
+                        <span className='font-semibold text-foreground'>{board.columns.length}</span>
                         <span>columns</span>
                       </div>
-                      <div className='flex items-center gap-2'>
-                        <Badge variant='secondary' className='h-5 min-w-5 px-1.5'>
-                          {taskCount}
-                        </Badge>
+                      <div className='flex items-center gap-1.5'>
+                        <span className='font-semibold text-foreground'>{taskCount}</span>
                         <span>tasks</span>
                       </div>
                     </div>
