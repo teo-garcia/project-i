@@ -1,0 +1,16 @@
+{
+  "extends": "@teo-garcia/tsconfig-shared/next",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./app/*"]
+    },
+    "types": ["@vitest/browser/context"]
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "./jest.setup.js"
+  ]
+}

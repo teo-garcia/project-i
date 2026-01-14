@@ -1,0 +1,4 @@
+pnpm tsc --noEmit
+
+pnpm lint-staged
+
