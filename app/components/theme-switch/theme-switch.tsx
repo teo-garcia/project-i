@@ -3,6 +3,8 @@
 import { Laptop, Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 
+import { Button } from '@/components/ui/button'
+
 type ThemeMode = 'light' | 'dark' | 'system'
 
 export const ThemeSwitch = () => {
@@ -43,13 +45,15 @@ export const ThemeSwitch = () => {
   }
 
   return (
-    <button
+    <Button
       onClick={handleClick}
+      variant='outline'
+      size='icon'
       aria-label={`Theme switcher, current mode: ${activeTheme}`}
-      className='fixed right-4 top-4 rounded-lg border p-2 md:right-8 md:top-8 transition-colors duration-200 hover:bg-accent hover:text-accent-foreground'
+      className='fixed right-4 top-4 md:right-8 md:top-8'
       title={`Current theme: ${activeTheme}. Click to switch to ${getNextTheme()}`}
     >
       {getCurrentIcon()}
-    </button>
+    </Button>
   )
 }

@@ -44,12 +44,15 @@ interaction code.
 
 Goal:
 - Add the UI blocks used across the Task Board.
+- Convert the theme switch to a shadcn/ui button for consistency.
 
 Deliverables:
 - Card, Dialog, Badge, Avatar, DropdownMenu components installed.
+- Theme switch uses shadcn/ui `Button`.
 
 Next action:
 - Use the shadcn CLI to add each component after init.
+- Update `ThemeSwitch` to use the new button.
 
 ---
 
