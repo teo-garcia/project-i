@@ -4,12 +4,15 @@ export type TaskAssignee = {
   initials: string
 }
 
+export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent'
+
 export type Task = {
   id: string
   title: string
   description: string
   labels: string[]
   dueDate: string
+  priority: TaskPriority
   assignees: TaskAssignee[]
 }
 
@@ -43,6 +46,7 @@ const boards: Board[] = [
               'Craft the hero copy and supporting story for the public launch page.',
             labels: ['Design', 'Marketing'],
             dueDate: '2025-04-04',
+            priority: 'high',
             assignees: [
               { id: 'sam', name: 'Sam Rivera', initials: 'SR' },
               { id: 'casey', name: 'Casey Lin', initials: 'CL' },
@@ -55,6 +59,7 @@ const boards: Board[] = [
               'Summarize beta program feedback and highlight key takeaways.',
             labels: ['Research'],
             dueDate: '2025-04-06',
+            priority: 'medium',
             assignees: [{ id: 'jo', name: 'Jo Singh', initials: 'JS' }],
           },
         ],
@@ -70,6 +75,7 @@ const boards: Board[] = [
               'Update pricing tiers, add FAQs, and align copy with new positioning.',
             labels: ['Product', 'Marketing'],
             dueDate: '2025-04-09',
+            priority: 'urgent',
             assignees: [
               { id: 'mari', name: 'Mari Campos', initials: 'MC' },
             ],
@@ -81,6 +87,7 @@ const boards: Board[] = [
               'Run a dry launch, confirm tracking pixels, and verify release notes.',
             labels: ['Ops'],
             dueDate: '2025-04-10',
+            priority: 'high',
             assignees: [
               { id: 'elena', name: 'Elena Park', initials: 'EP' },
               { id: 'amir', name: 'Amir Patel', initials: 'AP' },
@@ -99,6 +106,7 @@ const boards: Board[] = [
               'Draft the launch update for investors and internal stakeholders.',
             labels: ['Comms'],
             dueDate: '2025-04-02',
+            priority: 'low',
             assignees: [{ id: 'taylor', name: 'Taylor Reese', initials: 'TR' }],
           },
         ],
@@ -121,6 +129,7 @@ const boards: Board[] = [
               'Outline incentives and guardrails for a multi-sided referral program.',
             labels: ['Growth'],
             dueDate: '2025-04-12',
+            priority: 'medium',
             assignees: [{ id: 'jamie', name: 'Jamie Fox', initials: 'JF' }],
           },
         ],
@@ -136,6 +145,7 @@ const boards: Board[] = [
               'Rework onboarding email series with new activation milestones.',
             labels: ['Lifecycle', 'Email'],
             dueDate: '2025-04-14',
+            priority: 'high',
             assignees: [
               { id: 'riley', name: 'Riley Jones', initials: 'RJ' },
             ],
@@ -153,6 +163,7 @@ const boards: Board[] = [
               'Run a split test on the hero CTA and social proof module.',
             labels: ['Experiment'],
             dueDate: '2025-04-16',
+            priority: 'low',
             assignees: [
               { id: 'dev', name: 'Dev Anand', initials: 'DA' },
               { id: 'min', name: 'Min Lee', initials: 'ML' },
@@ -193,3 +204,27 @@ export const getTaskById = (boardId: string, taskId: string) => {
 
 export const countBoardTasks = (board: Board) =>
   board.columns.reduce((total, column) => total + column.tasks.length, 0)
+
+export const getPriorityVariant = (priority: TaskPriority): 'default' | 'secondary' | 'destructive' | 'outline' => {
+  switch (priority) {
+    case 'urgent':
+      return 'destructive'
+    case 'high':
+      return 'default'
+    case 'medium':
+      return 'secondary'
+    case 'low':
+      return 'outline'
+  }
+}
+
+export const isTaskOverdue = (dueDate: string): boolean => {
+  return new Date(dueDate) < new Date()
+}
+
+export const isTaskDueSoon = (dueDate: string): boolean => {
+  const due = new Date(dueDate)
+  const now = new Date()
+  const threeDaysFromNow = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000)
+  return due > now && due <= threeDaysFromNow
+}

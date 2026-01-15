@@ -29,13 +29,13 @@ export const ThemeSwitch = () => {
   const getCurrentIcon = () => {
     switch (activeTheme) {
       case 'light': {
-        return <Sun className='size-5' />
+        return <Sun className='size-4' />
       }
       case 'dark': {
-        return <Moon className='size-5' />
+        return <Moon className='size-4' />
       }
       default: {
-        return <Laptop className='size-5' />
+        return <Laptop className='size-4' />
       }
     }
   }
@@ -47,10 +47,10 @@ export const ThemeSwitch = () => {
   return (
     <Button
       onClick={handleClick}
-      variant='outline'
+      variant='ghost'
       size='icon'
       aria-label={`Theme switcher, current mode: ${activeTheme}`}
-      className='fixed right-4 top-4 md:right-8 md:top-8'
+      className='h-9 w-9'
       title={`Current theme: ${activeTheme}. Click to switch to ${getNextTheme()}`}
     >
       {getCurrentIcon()}
