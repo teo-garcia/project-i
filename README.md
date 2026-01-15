@@ -1,112 +1,223 @@
-<div align="center">
+# Task Board - Learning Next.js
 
-# React Template Next
+A modern task board application built to learn Next.js 15 concepts incrementally. This project demonstrates the App Router, Server Components, intercepting routes, and modern React patterns.
 
-**Production-ready Next.js starter with TypeScript, Tailwind CSS, and modern
-testing**
+## Project Overview
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE.md)
-[![Node](https://img.shields.io/badge/Node-22+-339933?logo=node.js&logoColor=white)](https://nodejs.org)
-[![pnpm](https://img.shields.io/badge/pnpm-9+-F69220?logo=pnpm&logoColor=white)](https://pnpm.io)
-[![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org)
-[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev)
+This is a kanban-style task board where you can organize tasks across columns, filter by priority and labels, and view task details in a modal overlay. Built with a focus on learning Next.js features step-by-step.
 
-Part of the [@teo-garcia/templates](https://github.com/teo-garcia/templates)
-ecosystem
+## Tech Stack
 
-</div>
+- **Next.js 16** - App Router, Server Components, Metadata API
+- **React 19** - Server Components, Client Components, hooks
+- **TypeScript** - Full type safety
+- **Tailwind CSS 4** - Utility-first styling with oklch colors
+- **shadcn/ui** - High-quality UI components built on Radix
+- **next-themes** - Theme management (light/dark/system)
 
----
+## Key Next.js Concepts Learned
 
-## Features
+### 1. App Router Architecture
+- File-based routing with `app/` directory
+- Route groups for organization without URL segments
+- Nested layouts for shared UI across routes
 
-| Category         | Technologies                             |
-| ---------------- | ---------------------------------------- |
-| **Framework**    | Next.js 16 with App Router and Turbopack |
-| **UI**           | React 19, Tailwind CSS 4, Lucide Icons   |
-| **Data**         | React Query for server state management  |
-| **Type Safety**  | TypeScript with strict mode              |
-| **Testing**      | Vitest + Testing Library + MSW           |
-| **Code Quality** | ESLint, Prettier, Husky, lint-staged     |
+### 2. Server vs Client Components
+- **Server Components** (default): Fetch data, access backend directly, reduce client JS
+- **Client Components** (`'use client'`): Interactive state, event handlers, browser APIs
+- Strategic placement: server for data fetching, client for interactivity
 
-## Requirements
+### 3. Dynamic Routes with Promises (Next.js 15+)
+```typescript
+// Breaking change: params is now a Promise
+type PageProps = {
+  params: Promise<{ id: string }>
+}
 
-- Node.js 22+
-- pnpm 9+
-
-## Quick Start
-
-```bash
-# Clone the template
-npx degit teo-garcia/react-template-next my-app
-cd my-app
-
-# Install dependencies
-pnpm install
-
-# Start development server
-pnpm dev
+const Page = async (props: PageProps) => {
+  const { id } = await props.params  // Must await!
+  // ...
+}
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to see your app.
+### 4. Intercepting Routes for Modals
+```
+app/
+  boards/
+    [id]/
+      @modal/              # Parallel route slot
+        (.)task/           # Intercepts /boards/[id]/task/[taskId]
+          [taskId]/
+            page.tsx       # Modal view
+      task/
+        [taskId]/
+          page.tsx         # Full page view (hard navigation)
+      page.tsx             # Board view
+```
+- Soft navigation (clicking from board) → shows modal
+- Hard navigation (URL direct) → shows full page
+- Clean URLs with `@modal/(.)` convention
+
+### 5. Metadata API
+```typescript
+export const generateMetadata = async (props: PageProps): Promise<Metadata> => {
+  const { id } = await props.params
+  const board = getBoardById(id)
+  return {
+    title: `${board.name} | Task Board`,
+    description: board.description,
+  }
+}
+```
+- Dynamic and static metadata
+- SEO-friendly without manual head management
+
+### 6. Component Patterns
+- **Server → Client data flow**: Pass props from Server to Client Components
+- **Client state with Server rendering**: Split into `page.tsx` (server) and `*-content.tsx` (client)
+- **Memoization**: `useMemo` for expensive filtering operations
+
+### 7. Styling Best Practices
+- Tailwind with oklch color space for better color interpolation
+- CSS variables in `globals.css` for theme tokens
+- Component variants with `cn()` utility
+- Responsive design with Tailwind breakpoints
+
+### 8. shadcn/ui Integration
+- Component library built on Radix primitives
+- Installed per-component (no bloat)
+- Fully customizable and owns the code
+- Examples: Card, Badge, Avatar, Tooltip, DropdownMenu
+
+## Current Features
+
+- ✅ Multiple boards with unique routes
+- ✅ Task columns (Backlog, In Progress, Done)
+- ✅ Task cards with priority indicators
+- ✅ Priority badges (urgent, high, medium, low)
+- ✅ Status badges (Overdue, Due Soon)
+- ✅ Filter by priority and labels
+- ✅ Toggle empty columns visibility
+- ✅ Task detail modal (intercepting route)
+- ✅ Theme switcher (light/dark/system)
+- ✅ Responsive design
+- ✅ Avatar tooltips showing assignee names
+- ✅ App header with navigation
+- ✅ Floating action button
+- ✅ Empty states
 
 ## Project Structure
 
 ```
 app/
-|-- api/                    # API routes
-|   `-- healthcheck/        # Health check endpoint
-|-- components/             # Shared UI components
-|-- providers/              # React context providers
-|-- config/                 # App configuration
-|-- layout.tsx              # Root layout
-`-- page.tsx                # Home page
+├── boards/
+│   └── [id]/                    # Dynamic board route
+│       ├── @modal/              # Parallel route for modals
+│       │   └── (.)task/         # Intercepts task detail
+│       │       └── [taskId]/    # Task modal view
+│       ├── task/
+│       │   └── [taskId]/        # Task full page view
+│       ├── board-content.tsx    # Client component with filtering
+│       └── page.tsx             # Server component
+├── components/
+│   ├── ui/                      # shadcn/ui components
+│   ├── app-header/              # Global navigation
+│   ├── board-filters/           # Filter dropdown
+│   ├── task-card/               # Task card with badges
+│   ├── task-detail/             # Task detail content
+│   ├── theme-switch/            # Theme toggle button
+│   └── ...
+├── lib/
+│   ├── data/
+│   │   └── task-board.ts        # Mock data and helper functions
+│   └── styles/
+│       └── globals.css          # Tailwind v4 entrypoint
+└── layout.tsx                   # Root layout with providers
 ```
 
-## Scripts
+## Helper Functions
 
-| Command              | Description                             |
-| -------------------- | --------------------------------------- |
-| `pnpm dev`           | Start development server with Turbopack |
-| `pnpm build`         | Create production build                 |
-| `pnpm start`         | Run production server                   |
-| `pnpm test`          | Run unit tests                          |
-| `pnpm test:browser`  | Run browser tests                       |
-| `pnpm lint:es`       | Lint and fix with ESLint                |
-| `pnpm lint:es:check` | Check ESLint without fixing             |
-| `pnpm lint:ts`       | TypeScript type checking                |
-| `pnpm format`        | Format with Prettier                    |
-| `pnpm format:check`  | Check formatting                        |
+Located in `app/lib/data/task-board.ts`:
 
-## Shared Configs
+```typescript
+// Badge variant based on priority
+getPriorityVariant(priority: TaskPriority): BadgeVariant
 
-This template uses standardized configurations from the ecosystem:
+// Check if task is overdue
+isTaskOverdue(dueDate: string): boolean
 
-- [`@teo-garcia/eslint-config-shared`](https://github.com/teo-garcia/eslint-config-shared) -
-  ESLint rules
-- [`@teo-garcia/prettier-config-shared`](https://github.com/teo-garcia/prettier-config-shared) -
-  Prettier formatting
-- [`@teo-garcia/tsconfig-shared`](https://github.com/teo-garcia/tsconfig-shared) -
-  TypeScript settings
-- [`@teo-garcia/vitest-config-shared`](https://github.com/teo-garcia/vitest-config-shared) -
-  Test configuration
-- [`@teo-garcia/react-shared`](https://github.com/teo-garcia/react-shared) -
-  Shared React utilities
+// Check if task is due within 3 days
+isTaskDueSoon(dueDate: string): boolean
 
-## Related Templates
+// Get board by ID
+getBoardById(id: string): Board | undefined
 
-| Template                                                                               | Description             |
-| -------------------------------------------------------------------------------------- | ----------------------- |
-| [react-template-rr](https://github.com/teo-garcia/react-template-rr)                   | React Router + Vite SPA |
-| [nest-template-monolith](https://github.com/teo-garcia/nest-template-monolith)         | NestJS backend monolith |
-| [nest-template-microservice](https://github.com/teo-garcia/nest-template-microservice) | NestJS microservice     |
+// Get task by board and task ID
+getTaskById(boardId: string, taskId: string): {...} | null
+```
 
-## License
+## Development Workflow
 
-MIT
+```bash
+# Install dependencies
+pnpm install
+
+# Start dev server
+pnpm dev
+
+# Type checking
+pnpm lint:ts
+
+# Linting
+pnpm lint:es
+
+# Format code
+pnpm format
+```
+
+## What's Next
+
+According to `IMPLEMENTATION.md`, we're ready for:
+
+**Step 5 - Drag-and-Drop Interactions**
+- Implement task reordering with `@dnd-kit`
+- Move tasks between columns
+- Optimistic UI updates
+
+See `IMPLEMENTATION.md` for the full roadmap.
+
+## Key Learnings Summary
+
+1. **Server Components are the default** - Use client components sparingly for interactivity
+2. **Route organization matters** - Intercepting routes enable smooth modal UX
+3. **Params are Promises in Next.js 15+** - Always await them
+4. **Split server/client strategically** - Fetch on server, handle state on client
+5. **Tailwind v4 uses CSS entrypoint** - No more `tailwind.config.js`
+6. **shadcn/ui is component-first** - Install only what you need
+7. **Type safety everywhere** - TypeScript + strict mode catches errors early
+8. **Metadata API is powerful** - SEO without manual head tags
+
+## Troubleshooting
+
+### 404 on Dynamic Routes
+- Ensure params are awaited: `const { id } = await props.params`
+- Check route structure matches Next.js conventions
+
+### Theme Not Persisting
+- Verify `next-themes` ThemeProvider in root layout
+- Check localStorage is enabled in browser
+
+### Components Not Updating
+- Verify `'use client'` directive for stateful components
+- Check if state is lifted to appropriate component level
+
+## Resources
+
+- [Next.js Documentation](https://nextjs.org/docs)
+- [shadcn/ui Documentation](https://ui.shadcn.com)
+- [Tailwind CSS v4 Beta](https://tailwindcss.com/docs/v4-beta)
+- [Radix UI Primitives](https://www.radix-ui.com/primitives)
 
 ---
 
-<div align="center">
-  <sub>Built by <a href="https://github.com/teo-garcia">teo-garcia</a></sub>
-</div>
+Built while learning Next.js incrementally. See `IMPLEMENTATION.md` for step-by-step progress.
