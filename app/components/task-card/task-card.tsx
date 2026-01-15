@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { Task } from '@/lib/data/task-board'
 import { getPriorityVariant, isTaskOverdue, isTaskDueSoon } from '@/lib/data/task-board'
 
@@ -135,16 +136,30 @@ export const TaskCard = ({ task, boardId, onEdit, onDelete, onDuplicate }: TaskC
               {/* Assignees */}
               <div className='flex -space-x-2'>
                 {task.assignees.slice(0, 3).map((assignee) => (
-                  <Avatar key={assignee.id} className='size-6 border-2 border-card'>
-                    <AvatarFallback className='bg-primary text-primary-foreground text-[10px] font-semibold'>
-                      {assignee.initials}
-                    </AvatarFallback>
-                  </Avatar>
+                  <Tooltip key={assignee.id}>
+                    <TooltipTrigger asChild>
+                      <Avatar className='size-6 border-2 border-card cursor-pointer'>
+                        <AvatarFallback className='bg-primary text-primary-foreground text-[10px] font-semibold'>
+                          {assignee.initials}
+                        </AvatarFallback>
+                      </Avatar>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{assignee.name}</p>
+                    </TooltipContent>
+                  </Tooltip>
                 ))}
                 {task.assignees.length > 3 && (
-                  <div className='flex size-6 items-center justify-center rounded-full border-2 border-card bg-muted text-[10px] font-semibold text-muted-foreground'>
-                    +{task.assignees.length - 3}
-                  </div>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className='flex size-6 items-center justify-center rounded-full border-2 border-card bg-muted text-[10px] font-semibold text-muted-foreground cursor-pointer'>
+                        +{task.assignees.length - 3}
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{task.assignees.slice(3).map(a => a.name).join(', ')}</p>
+                    </TooltipContent>
+                  </Tooltip>
                 )}
               </div>
 
