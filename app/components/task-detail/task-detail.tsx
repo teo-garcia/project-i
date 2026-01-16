@@ -4,7 +4,6 @@ import { CalendarDays, ClipboardList } from 'lucide-react'
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { Task } from '@/lib/data/task-board'
 
 const formatDate = (value: string) =>

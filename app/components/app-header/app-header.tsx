@@ -1,10 +1,11 @@
 'use client'
 
-import { LayoutGrid, Plus, Search, Bell, User } from 'lucide-react'
+import { Bell, LayoutGrid, Plus, Search, User } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-import { Badge } from '@/components/ui/badge'
+import { ThemeSwitch } from '@/components/theme-switch/theme-switch'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -13,8 +14,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { ThemeSwitch } from '@/components/theme-switch/theme-switch'
 
 export const AppHeader = () => {
   const pathname = usePathname()

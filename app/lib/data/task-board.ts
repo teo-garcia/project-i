@@ -207,14 +207,18 @@ export const countBoardTasks = (board: Board) =>
 
 export const getPriorityVariant = (priority: TaskPriority): 'default' | 'secondary' | 'destructive' | 'outline' => {
   switch (priority) {
-    case 'urgent':
+    case 'urgent': {
       return 'destructive'
-    case 'high':
+    }
+    case 'high': {
       return 'default'
-    case 'medium':
+    }
+    case 'medium': {
       return 'secondary'
-    case 'low':
+    }
+    case 'low': {
       return 'outline'
+    }
   }
 }
 

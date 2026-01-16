@@ -1,9 +1,9 @@
 import '@/lib/styles/globals.css'
 
 import type { Metadata } from 'next'
-import { Space_Grotesk, DM_Sans } from 'next/font/google'
+import { DM_Sans,Space_Grotesk } from 'next/font/google'
 
-import { AppHeader } from './components/app-header/app-header'
+import { AppShell } from './components/app-shell/app-shell'
 import { GlobalProviders } from './components/global-providers/global-providers'
 
 export const metadata: Metadata = {
@@ -32,10 +32,7 @@ const RootLayout = async (properties: React.PropsWithChildren) => {
       <head />
       <body className={`${spaceGrotesk.variable} ${dmSans.variable} font-body antialiased`}>
         <GlobalProviders>
-          <div className='min-h-screen'>
-            <AppHeader />
-            <main>{children}</main>
-          </div>
+          <AppShell>{children}</AppShell>
         </GlobalProviders>
       </body>
     </html>

@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
+import { BoardPage } from '@/components/board-page/board-page'
 import { getBoardById } from '@/lib/data/task-board'
-import { BoardContent } from './board-content'
 
 type BoardPageProps = {
   params: Promise<{ id: string }>
@@ -24,7 +24,7 @@ export const generateMetadata = async (props: BoardPageProps): Promise<Metadata>
   }
 }
 
-const BoardPage = async (props: BoardPageProps) => {
+const BoardRoutePage = async (props: BoardPageProps) => {
   const { id } = await props.params
   const board = getBoardById(id)
 
@@ -32,7 +32,7 @@ const BoardPage = async (props: BoardPageProps) => {
     notFound()
   }
 
-  return <BoardContent board={board} />
+  return <BoardPage board={board} />
 }
 
-export default BoardPage
+export default BoardRoutePage

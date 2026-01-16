@@ -1,7 +1,6 @@
 'use client'
 
 import { Filter } from 'lucide-react'
-import { useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -15,7 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import type { TaskPriority } from '@/lib/data/task-board'
 
-export type BoardFilters = {
+export type BoardFiltersState = {
   priorities: TaskPriority[]
   labels: string[]
   showEmpty: boolean
@@ -23,13 +22,13 @@ export type BoardFilters = {
 
 type BoardFiltersProps = {
   allLabels: string[]
-  filters: BoardFilters
-  onFiltersChange: (filters: BoardFilters) => void
+  filters: BoardFiltersState
+  onFiltersChange: (filters: BoardFiltersState) => void
 }
 
 const priorityOptions: TaskPriority[] = ['urgent', 'high', 'medium', 'low']
 
-export const BoardFiltersComponent = ({ allLabels, filters, onFiltersChange }: BoardFiltersProps) => {
+export const BoardFilters = ({ allLabels, filters, onFiltersChange }: BoardFiltersProps) => {
   const activeFilterCount = filters.priorities.length + filters.labels.length + (filters.showEmpty ? 0 : 1)
 
   const togglePriority = (priority: TaskPriority) => {

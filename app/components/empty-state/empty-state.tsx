@@ -1,4 +1,4 @@
-import { Plus, Inbox } from 'lucide-react'
+import { Inbox,Plus } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 

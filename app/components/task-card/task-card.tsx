@@ -1,9 +1,11 @@
 'use client'
 
-import { CircleDot, MoreVertical, Pencil, Trash2, Copy } from 'lucide-react'
+import { CircleDot, Copy,MoreVertical, Pencil, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import {
   DropdownMenu,
@@ -12,11 +14,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { Task } from '@/lib/data/task-board'
-import { getPriorityVariant, isTaskOverdue, isTaskDueSoon } from '@/lib/data/task-board'
+import { getPriorityVariant, isTaskDueSoon,isTaskOverdue } from '@/lib/data/task-board'
 
 type TaskCardProps = {
   task: Task
@@ -26,6 +26,12 @@ type TaskCardProps = {
   onDuplicate?: () => void
 }
 
+const handleCardAction = (event: React.MouseEvent, action?: () => void) => {
+  event.preventDefault()
+  event.stopPropagation()
+  action?.()
+}
+
 const formatDate = (value: string) =>
   new Date(value).toLocaleDateString('en-US', {
     month: 'short',
@@ -33,12 +39,6 @@ const formatDate = (value: string) =>
   })
 
 export const TaskCard = ({ task, boardId, onEdit, onDelete, onDuplicate }: TaskCardProps) => {
-  const handleAction = (e: React.MouseEvent, action?: () => void) => {
-    e.preventDefault()
-    e.stopPropagation()
-    action?.()
-  }
-
   const overdue = isTaskOverdue(task.dueDate)
   const dueSoon = isTaskDueSoon(task.dueDate)
 
@@ -64,18 +64,18 @@ export const TaskCard = ({ task, boardId, onEdit, onDelete, onDuplicate }: TaskC
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align='end' className='w-40'>
-                <DropdownMenuItem onClick={(e) => handleAction(e, onEdit)}>
+                <DropdownMenuItem onClick={(e) => handleCardAction(e, onEdit)}>
                   <Pencil className='mr-2 size-3.5' />
                   Edit
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={(e) => handleAction(e, onDuplicate)}>
+                <DropdownMenuItem onClick={(e) => handleCardAction(e, onDuplicate)}>
                   <Copy className='mr-2 size-3.5' />
                   Duplicate
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className='text-destructive focus:text-destructive'
-                  onClick={(e) => handleAction(e, onDelete)}
+                  onClick={(e) => handleCardAction(e, onDelete)}
                 >
                   <Trash2 className='mr-2 size-3.5' />
                   Delete

@@ -1,6 +1,5 @@
 'use client'
-
-import { useEffect } from 'react'
+import { ErrorScreen } from '@/components/error-screen/error-screen'
 
 export interface GlobalErrorProperties {
   error: Error & { digest?: string }
@@ -8,20 +7,7 @@ export interface GlobalErrorProperties {
 }
 
 const GlobalErrorBoundary = (properties: GlobalErrorProperties) => {
-  const { error, reset } = properties
-
-  useEffect(() => {
-    console.error(error)
-  }, [error])
-
-  return (
-    <html lang='en'>
-      <body>
-        <h2>Something went wrong!</h2>
-        <button onClick={() => reset()}>Try again</button>
-      </body>
-    </html>
-  )
+  return <ErrorScreen {...properties} />
 }
 
 export default GlobalErrorBoundary

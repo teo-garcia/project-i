@@ -13,7 +13,7 @@ export const GlobalProviders = (properties: React.PropsWithChildren) => {
 
   useEffect(() => {
     if (globalThis.window != undefined) {
-      import('../../lib/mocks').then(({ setupMSWBrowser }) => setupMSWBrowser())
+      import('@/lib/mocks').then(({ setupMSWBrowser }) => setupMSWBrowser())
     }
   }, [])
 

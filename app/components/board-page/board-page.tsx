@@ -1,22 +1,72 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
+import Link from 'next/link'
+import { useMemo, useState } from 'react'
 
-import { Badge } from '@/components/ui/badge'
-import { BoardFiltersComponent, type BoardFilters } from '@/components/board-filters/board-filters'
+import type { BoardFiltersState } from '@/components/board-filters/board-filters'
+import { BoardFilters } from '@/components/board-filters/board-filters'
 import { EmptyState } from '@/components/empty-state/empty-state'
 import { FloatingActionButton } from '@/components/floating-action-button/floating-action-button'
+import { GradientOrbs } from '@/components/gradient-orbs/gradient-orbs'
 import { TaskCard } from '@/components/task-card/task-card'
-import type { Board } from '@/lib/data/task-board'
+import { Badge } from '@/components/ui/badge'
+import type { Board, Task } from '@/lib/data/task-board'
 
-type BoardContentProps = {
+type BoardPageProps = {
   board: Board
 }
 
-export const BoardContent = ({ board }: BoardContentProps) => {
-  const [filters, setFilters] = useState<BoardFilters>({
+const collectBoardLabels = (board: Board) => {
+  const labels = new Set<string>()
+  for (const column of board.columns) {
+    for (const task of column.tasks) {
+      for (const label of task.labels) {
+        labels.add(label)
+      }
+    }
+  }
+  // eslint-disable-next-line unicorn/no-array-sort
+  return [...labels].sort((a, b) => a.localeCompare(b))
+}
+
+const taskMatchesFilters = (task: Task, filters: BoardFiltersState) => {
+  if (filters.priorities.length > 0 && !filters.priorities.includes(task.priority)) {
+    return false
+  }
+
+  if (filters.labels.length === 0) {
+    return true
+  }
+
+  return task.labels.some((label) => filters.labels.includes(label))
+}
+
+const filterBoardColumns = (board: Board, filters: BoardFiltersState) => {
+  const filteredColumns: Board['columns'] = []
+
+  for (const column of board.columns) {
+    const tasks = []
+
+    for (const task of column.tasks) {
+      if (taskMatchesFilters(task, filters)) {
+        tasks.push(task)
+      }
+    }
+
+    if (filters.showEmpty || tasks.length > 0) {
+      filteredColumns.push({
+        ...column,
+        tasks,
+      })
+    }
+  }
+
+  return filteredColumns
+}
+
+export const BoardPage = ({ board }: BoardPageProps) => {
+  const [filters, setFilters] = useState<BoardFiltersState>({
     priorities: [],
     labels: [],
     showEmpty: true,
@@ -24,49 +74,12 @@ export const BoardContent = ({ board }: BoardContentProps) => {
 
   const totalTasks = board.columns.reduce((total, column) => total + column.tasks.length, 0)
 
-  // Get all unique labels
-  const allLabels = useMemo(() => {
-    const labels = new Set<string>()
-    board.columns.forEach(column => {
-      column.tasks.forEach(task => {
-        task.labels.forEach(label => labels.add(label))
-      })
-    })
-    return Array.from(labels).sort()
-  }, [board])
-
-  // Filter tasks
-  const filteredColumns = useMemo(() => {
-    return board.columns.map(column => {
-      const filteredTasks = column.tasks.filter(task => {
-        // Priority filter
-        if (filters.priorities.length > 0 && !filters.priorities.includes(task.priority)) {
-          return false
-        }
-
-        // Label filter
-        if (filters.labels.length > 0) {
-          const hasMatchingLabel = task.labels.some(label => filters.labels.includes(label))
-          if (!hasMatchingLabel) return false
-        }
-
-        return true
-      })
-
-      return {
-        ...column,
-        tasks: filteredTasks,
-      }
-    }).filter(column => filters.showEmpty || column.tasks.length > 0)
-  }, [board, filters])
+  const allLabels = useMemo(() => collectBoardLabels(board), [board])
+  const filteredColumns = useMemo(() => filterBoardColumns(board, filters), [board, filters])
 
   return (
     <section className='relative min-h-screen overflow-hidden bg-background px-6 pb-16 pt-16 sm:px-10 sm:pb-20 sm:pt-20'>
-      <div className='pointer-events-none absolute inset-0'>
-        <div className='absolute -left-24 top-28 h-64 w-64 rounded-full bg-[radial-gradient(circle,rgba(16,185,129,0.28),transparent_65%)] blur-2xl' />
-        <div className='absolute right-[-5rem] top-[-4rem] h-80 w-80 rounded-full bg-[radial-gradient(circle,rgba(251,146,60,0.28),transparent_60%)] blur-3xl' />
-        <div className='absolute bottom-[-9rem] left-1/2 h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.22),transparent_60%)] blur-3xl' />
-      </div>
+      <GradientOrbs variant='board' />
       <div className='relative mx-auto flex w-full max-w-7xl flex-col gap-10'>
         <header className='grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] animate-in fade-in slide-in-from-bottom-6 duration-700'>
           <div className='space-y-4'>
@@ -82,7 +95,7 @@ export const BoardContent = ({ board }: BoardContentProps) => {
                 <Badge variant='outline' className='border-primary/30 bg-primary/10 text-xs font-medium text-primary'>
                   Board
                 </Badge>
-                <BoardFiltersComponent
+                <BoardFilters
                   allLabels={allLabels}
                   filters={filters}
                   onFiltersChange={setFilters}
@@ -129,7 +142,6 @@ export const BoardContent = ({ board }: BoardContentProps) => {
         <div className='grid gap-5 lg:grid-cols-3 animate-in fade-in slide-in-from-bottom-4 duration-700'>
           {filteredColumns.map((column) => (
             <div key={column.id} className='flex flex-col gap-3.5'>
-              {/* Column header */}
               <div className='flex items-center justify-between rounded-2xl border border-border/60 bg-card/85 px-4 py-3 shadow-sm'>
                 <h2 className='text-sm font-semibold'>{column.name}</h2>
                 <span className='text-xs font-medium text-muted-foreground'>
@@ -137,7 +149,6 @@ export const BoardContent = ({ board }: BoardContentProps) => {
                 </span>
               </div>
 
-              {/* Tasks */}
               <div className='flex flex-col gap-2.5'>
                 {column.tasks.length > 0 ? (
                   column.tasks.map((task) => (

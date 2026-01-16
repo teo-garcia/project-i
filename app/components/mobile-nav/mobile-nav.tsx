@@ -3,6 +3,7 @@
 import { BarChart3, LayoutGrid, Menu, Settings, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -11,7 +12,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
 
 export const MobileNav = () => {
   return (
