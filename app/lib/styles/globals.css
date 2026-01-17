@@ -227,6 +227,10 @@
     font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
   }
 
+  .app-container {
+    @apply mx-auto w-full max-w-7xl px-6 sm:px-10;
+  }
+
   /* Subtle gradient backgrounds */
   .bg-mesh-gradient {
     background-image:

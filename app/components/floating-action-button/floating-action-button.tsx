@@ -20,12 +20,17 @@ export const FloatingActionButton = () => {
         <DropdownMenuTrigger asChild>
           <Button
             size='lg'
-            className='size-14 rounded-full border border-primary/20 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-[0_18px_40px_-20px_rgba(30,64,175,0.6)] transition-transform hover:scale-105 active:scale-95'
+            className='relative size-14 rounded-full border border-primary/25 bg-gradient-to-br from-primary via-primary to-primary/70 text-primary-foreground shadow-[0_22px_48px_-18px_rgba(30,64,175,0.75)] ring-2 ring-primary/25 transition-transform hover:scale-105 active:scale-95 after:absolute after:inset-0 after:rounded-full after:shadow-[0_0_18px_rgba(59,130,246,0.45)] after:opacity-0 after:transition after:duration-200 hover:after:opacity-100'
           >
             <Plus className='size-6' />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align='end' className='w-48 rounded-xl border border-border/80 bg-card/95 shadow-lg'>
+        <DropdownMenuContent
+          align='end'
+          sideOffset={10}
+          collisionPadding={12}
+          className='w-48 max-w-[calc(100vw-1.5rem)] rounded-2xl border border-border/80 bg-popover p-1.5 shadow-lg backdrop-blur'
+        >
           <DropdownMenuItem className='cursor-pointer'>
             <Plus className='mr-2 size-4' />
             New Task

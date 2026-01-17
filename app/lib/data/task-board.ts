@@ -76,9 +76,7 @@ const boards: Board[] = [
             labels: ['Product', 'Marketing'],
             dueDate: '2025-04-09',
             priority: 'urgent',
-            assignees: [
-              { id: 'mari', name: 'Mari Campos', initials: 'MC' },
-            ],
+            assignees: [{ id: 'mari', name: 'Mari Campos', initials: 'MC' }],
           },
           {
             id: 'task-4',
@@ -146,9 +144,7 @@ const boards: Board[] = [
             labels: ['Lifecycle', 'Email'],
             dueDate: '2025-04-14',
             priority: 'high',
-            assignees: [
-              { id: 'riley', name: 'Riley Jones', initials: 'RJ' },
-            ],
+            assignees: [{ id: 'riley', name: 'Riley Jones', initials: 'RJ' }],
           },
         ],
       },
@@ -175,11 +171,14 @@ const boards: Board[] = [
   },
 ]
 
+// Read all boards (mock data source for now).
 export const getBoards = () => boards
 
+// Fetch a board by id.
 export const getBoardById = (boardId: string) =>
   boards.find((board) => board.id === boardId)
 
+// Find a task inside a board and return its board/column context.
 export const getTaskById = (boardId: string, taskId: string) => {
   const board = getBoardById(boardId)
 
@@ -202,10 +201,14 @@ export const getTaskById = (boardId: string, taskId: string) => {
   return null
 }
 
+// Count tasks across all columns in a board.
 export const countBoardTasks = (board: Board) =>
   board.columns.reduce((total, column) => total + column.tasks.length, 0)
 
-export const getPriorityVariant = (priority: TaskPriority): 'default' | 'secondary' | 'destructive' | 'outline' => {
+// Map priority to badge variant for consistent UI color.
+export const getPriorityVariant = (
+  priority: TaskPriority
+): 'default' | 'secondary' | 'destructive' | 'outline' => {
   switch (priority) {
     case 'urgent': {
       return 'destructive'
@@ -222,10 +225,12 @@ export const getPriorityVariant = (priority: TaskPriority): 'default' | 'seconda
   }
 }
 
+// Overdue if due date is before now.
 export const isTaskOverdue = (dueDate: string): boolean => {
   return new Date(dueDate) < new Date()
 }
 
+// Due soon if the task lands within the next 3 days.
 export const isTaskDueSoon = (dueDate: string): boolean => {
   const due = new Date(dueDate)
   const now = new Date()

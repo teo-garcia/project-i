@@ -11,10 +11,15 @@ type TaskDetailPageProps = {
   boardName: string
 }
 
-export const TaskDetailPage = ({ boardId, task, columnName, boardName }: TaskDetailPageProps) => {
+export const TaskDetailPage = ({
+  boardId,
+  task,
+  columnName,
+  boardName,
+}: TaskDetailPageProps) => {
   return (
     <section className='min-h-screen bg-background px-6 py-12 sm:px-10 sm:py-14'>
-      <div className='mx-auto flex w-full max-w-5xl flex-col gap-8'>
+      <div className='app-container flex flex-col gap-8'>
         <Link
           href={`/boards/${boardId}`}
           className='inline-flex items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground'
@@ -22,11 +27,7 @@ export const TaskDetailPage = ({ boardId, task, columnName, boardName }: TaskDet
           <ArrowLeft className='size-4' />
           Back to board
         </Link>
-        <TaskDetail
-          task={task}
-          columnName={columnName}
-          boardName={boardName}
-        />
+        <TaskDetail task={task} columnName={columnName} boardName={boardName} />
       </div>
     </section>
   )

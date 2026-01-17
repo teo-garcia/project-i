@@ -21,7 +21,7 @@ export const AppHeader = () => {
 
   return (
     <header className='sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl'>
-      <div className='mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-6 sm:px-10'>
+      <div className='app-container flex h-16 items-center justify-between'>
         {/* Logo and Nav */}
         <div className='flex items-center gap-8'>
           <Link href='/' className='flex items-center gap-2 font-bold'>
@@ -78,7 +78,11 @@ export const AppHeader = () => {
           {/* User Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant='ghost' size='icon' className='h-9 w-9 rounded-full'>
+              <Button
+                variant='ghost'
+                size='icon'
+                className='h-9 w-9 rounded-full'
+              >
                 <Avatar className='size-8'>
                   <AvatarFallback className='bg-primary/10 text-primary text-xs font-semibold'>
                     JD
@@ -95,7 +99,9 @@ export const AppHeader = () => {
                 </Avatar>
                 <div className='flex flex-col'>
                   <span className='text-sm font-semibold'>John Doe</span>
-                  <span className='text-xs text-muted-foreground'>john@example.com</span>
+                  <span className='text-xs text-muted-foreground'>
+                    john@example.com
+                  </span>
                 </div>
               </div>
               <DropdownMenuSeparator />

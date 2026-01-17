@@ -12,13 +12,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import type { TaskPriority } from '@/lib/data/task-board'
-
-export type BoardFiltersState = {
-  priorities: TaskPriority[]
-  labels: string[]
-  showEmpty: boolean
-}
+import {
+  type BoardFiltersState,
+  clearBoardFilters,
+  getBoardFilterCount,
+  getBoardFilterOptions,
+  setShowEmptyColumns,
+  toggleLabelFilter,
+  togglePriorityFilter,
+} from '@/lib/board/filters'
 
 type BoardFiltersProps = {
   allLabels: string[]
@@ -26,34 +28,12 @@ type BoardFiltersProps = {
   onFiltersChange: (filters: BoardFiltersState) => void
 }
 
-const priorityOptions: TaskPriority[] = ['urgent', 'high', 'medium', 'low']
-
-export const BoardFilters = ({ allLabels, filters, onFiltersChange }: BoardFiltersProps) => {
-  const activeFilterCount = filters.priorities.length + filters.labels.length + (filters.showEmpty ? 0 : 1)
-
-  const togglePriority = (priority: TaskPriority) => {
-    const newPriorities = filters.priorities.includes(priority)
-      ? filters.priorities.filter(p => p !== priority)
-      : [...filters.priorities, priority]
-
-    onFiltersChange({ ...filters, priorities: newPriorities })
-  }
-
-  const toggleLabel = (label: string) => {
-    const newLabels = filters.labels.includes(label)
-      ? filters.labels.filter(l => l !== label)
-      : [...filters.labels, label]
-
-    onFiltersChange({ ...filters, labels: newLabels })
-  }
-
-  const clearFilters = () => {
-    onFiltersChange({
-      priorities: [],
-      labels: [],
-      showEmpty: true,
-    })
-  }
+export const BoardFilters = ({
+  allLabels,
+  filters,
+  onFiltersChange,
+}: BoardFiltersProps) => {
+  const activeFilterCount = getBoardFilterCount(filters)
 
   return (
     <DropdownMenu>
@@ -62,7 +42,10 @@ export const BoardFilters = ({ allLabels, filters, onFiltersChange }: BoardFilte
           <Filter className='size-4' />
           <span>Filter</span>
           {activeFilterCount > 0 && (
-            <Badge variant='secondary' className='ml-1 size-5 rounded-full p-0 text-xs'>
+            <Badge
+              variant='secondary'
+              className='ml-1 size-5 rounded-full p-0 text-xs'
+            >
               {activeFilterCount}
             </Badge>
           )}
@@ -76,11 +59,13 @@ export const BoardFilters = ({ allLabels, filters, onFiltersChange }: BoardFilte
         <DropdownMenuLabel className='text-xs font-normal text-muted-foreground'>
           Priority
         </DropdownMenuLabel>
-        {priorityOptions.map((priority) => (
+        {getBoardFilterOptions().map((priority) => (
           <DropdownMenuCheckboxItem
             key={priority}
             checked={filters.priorities.includes(priority)}
-            onCheckedChange={() => togglePriority(priority)}
+            onCheckedChange={() =>
+              onFiltersChange(togglePriorityFilter(filters, priority))
+            }
             className='capitalize'
           >
             {priority}
@@ -99,7 +84,9 @@ export const BoardFilters = ({ allLabels, filters, onFiltersChange }: BoardFilte
               <DropdownMenuCheckboxItem
                 key={label}
                 checked={filters.labels.includes(label)}
-                onCheckedChange={() => toggleLabel(label)}
+                onCheckedChange={() =>
+                  onFiltersChange(toggleLabelFilter(filters, label))
+                }
               >
                 {label}
               </DropdownMenuCheckboxItem>
@@ -111,7 +98,9 @@ export const BoardFilters = ({ allLabels, filters, onFiltersChange }: BoardFilte
         {/* Show Empty Columns */}
         <DropdownMenuCheckboxItem
           checked={filters.showEmpty}
-          onCheckedChange={(checked) => onFiltersChange({ ...filters, showEmpty: checked })}
+          onCheckedChange={(checked) =>
+            onFiltersChange(setShowEmptyColumns(filters, checked))
+          }
         >
           Show empty columns
         </DropdownMenuCheckboxItem>
@@ -123,7 +112,7 @@ export const BoardFilters = ({ allLabels, filters, onFiltersChange }: BoardFilte
               variant='ghost'
               size='sm'
               className='w-full'
-              onClick={clearFilters}
+              onClick={() => onFiltersChange(clearBoardFilters())}
             >
               Clear filters
             </Button>

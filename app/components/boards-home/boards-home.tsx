@@ -11,13 +11,19 @@ type BoardsHomeProps = {
 }
 
 export const BoardsHome = ({ boards }: BoardsHomeProps) => {
-  const taskCount = boards.reduce((total, board) => total + countBoardTasks(board), 0)
-  const columnCount = boards.reduce((total, board) => total + board.columns.length, 0)
+  const taskCount = boards.reduce(
+    (total, board) => total + countBoardTasks(board),
+    0
+  )
+  const columnCount = boards.reduce(
+    (total, board) => total + board.columns.length,
+    0
+  )
 
   return (
     <section className='relative min-h-screen overflow-hidden bg-background px-6 pb-14 pt-12 sm:px-10 sm:pb-16 sm:pt-14'>
       <GradientOrbs variant='home' />
-      <div className='relative mx-auto flex w-full max-w-6xl flex-col gap-12'>
+      <div className='app-container relative flex flex-col gap-12'>
         <header className='grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] animate-in fade-in slide-in-from-bottom-6 duration-700'>
           <div className='space-y-6'>
             <div className='flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground'>
@@ -29,8 +35,9 @@ export const BoardsHome = ({ boards }: BoardsHomeProps) => {
                 Task Board for teams that ship with clarity.
               </h1>
               <p className='max-w-2xl text-base text-muted-foreground sm:text-lg'>
-                Build momentum with kanban boards that feel alive. Snap tasks into motion, spotlight priorities,
-                and keep every project crystal clear.
+                Build momentum with kanban boards that feel alive. Snap tasks
+                into motion, spotlight priorities, and keep every project
+                crystal clear.
               </p>
             </div>
             <div className='flex flex-wrap items-center gap-4'>

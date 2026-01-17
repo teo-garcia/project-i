@@ -5,13 +5,7 @@ import { CalendarDays, ClipboardList } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import type { Task } from '@/lib/data/task-board'
-
-const formatDate = (value: string) =>
-  new Date(value).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  })
+import { formatLongDate } from '@/lib/formatting/date'
 
 type TaskDetailProps = {
   task: Task
@@ -19,15 +13,21 @@ type TaskDetailProps = {
   boardName: string
 }
 
-export const TaskDetail = ({ task, columnName, boardName }: TaskDetailProps) => {
+export const TaskDetail = ({
+  task,
+  columnName,
+  boardName,
+}: TaskDetailProps) => {
   return (
-    <div className='space-y-7 rounded-2xl border border-border/90 bg-card p-5 sm:p-6'>
+    <div className='space-y-7'>
       {/* Header */}
       <div className='space-y-3'>
         <Badge variant='outline' className='text-xs font-medium'>
           {boardName} · {columnName}
         </Badge>
-        <h2 className='text-3xl font-bold leading-tight tracking-tight'>{task.title}</h2>
+        <h2 className='text-3xl font-bold leading-tight tracking-tight'>
+          {task.title}
+        </h2>
         <p className='text-base text-muted-foreground'>{task.description}</p>
       </div>
 
@@ -54,8 +54,12 @@ export const TaskDetail = ({ task, columnName, boardName }: TaskDetailProps) => 
               <CalendarDays className='size-4 text-primary' />
             </div>
             <div>
-              <p className='text-xs font-medium text-muted-foreground'>Due Date</p>
-              <p className='text-sm font-semibold'>{formatDate(task.dueDate)}</p>
+              <p className='text-xs font-medium text-muted-foreground'>
+                Due Date
+              </p>
+              <p className='text-sm font-semibold'>
+                {formatLongDate(task.dueDate)}
+              </p>
             </div>
           </div>
         </div>
@@ -67,8 +71,12 @@ export const TaskDetail = ({ task, columnName, boardName }: TaskDetailProps) => 
               <ClipboardList className='size-4 text-primary' />
             </div>
             <div>
-              <p className='text-xs font-medium text-muted-foreground'>Assignees</p>
-              <p className='text-sm font-semibold'>{task.assignees.length} assigned</p>
+              <p className='text-xs font-medium text-muted-foreground'>
+                Assignees
+              </p>
+              <p className='text-sm font-semibold'>
+                {task.assignees.length} assigned
+              </p>
             </div>
           </div>
         </div>
@@ -80,7 +88,10 @@ export const TaskDetail = ({ task, columnName, boardName }: TaskDetailProps) => 
           <h3 className='text-sm font-semibold'>Team Members</h3>
           <div className='space-y-2'>
             {task.assignees.map((assignee) => (
-              <div key={assignee.id} className='flex items-center gap-3 rounded-xl border border-border/90 bg-background p-3'>
+              <div
+                key={assignee.id}
+                className='flex items-center gap-3 rounded-xl border border-border/90 bg-background p-3'
+              >
                 <Avatar className='size-9'>
                   <AvatarFallback className='bg-primary text-primary-foreground text-xs font-semibold'>
                     {assignee.initials}

@@ -24,7 +24,7 @@ export const TaskDetailModal = ({ params }: TaskDetailModalProps) => {
 
   return (
     <Dialog open onOpenChange={() => router.back()}>
-      <DialogContent className='max-w-4xl border-border/90 bg-background p-6 sm:p-8'>
+      <DialogContent className='max-w-5xl border-border/90 bg-background p-6 sm:p-8'>
         <DialogHeader>
           <DialogTitle className='sr-only'>Task details</DialogTitle>
         </DialogHeader>
