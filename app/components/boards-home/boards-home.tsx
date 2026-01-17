@@ -15,17 +15,17 @@ export const BoardsHome = ({ boards }: BoardsHomeProps) => {
   const columnCount = boards.reduce((total, board) => total + board.columns.length, 0)
 
   return (
-    <section className='relative min-h-screen overflow-hidden bg-background px-6 pb-16 pt-16 sm:px-10 sm:pb-20 sm:pt-20'>
+    <section className='relative min-h-screen overflow-hidden bg-background px-6 pb-14 pt-12 sm:px-10 sm:pb-16 sm:pt-14'>
       <GradientOrbs variant='home' />
-      <div className='relative mx-auto flex w-full max-w-6xl flex-col gap-10'>
-        <header className='grid gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] animate-in fade-in slide-in-from-bottom-6 duration-700'>
-          <div className='space-y-7'>
+      <div className='relative mx-auto flex w-full max-w-6xl flex-col gap-12'>
+        <header className='grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] animate-in fade-in slide-in-from-bottom-6 duration-700'>
+          <div className='space-y-6'>
             <div className='flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground'>
               <LayoutGrid className='size-4' />
               <span>Your Boards</span>
             </div>
             <div className='space-y-3'>
-              <h1 className='text-balance text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl'>
+              <h1 className='text-balance text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl'>
                 Task Board for teams that ship with clarity.
               </h1>
               <p className='max-w-2xl text-base text-muted-foreground sm:text-lg'>
@@ -34,19 +34,19 @@ export const BoardsHome = ({ boards }: BoardsHomeProps) => {
               </p>
             </div>
             <div className='flex flex-wrap items-center gap-4'>
-              <Badge className='rounded-full border-0 bg-primary px-4 py-1.5 text-sm text-primary-foreground shadow-lg shadow-primary/20'>
+              <Badge className='rounded-full border-0 bg-primary px-4 py-1.5 text-sm text-primary-foreground shadow-md shadow-primary/20'>
                 Live teamwork
               </Badge>
-              <Badge className='rounded-full border border-border bg-background/70 px-4 py-1.5 text-sm text-foreground'>
+              <Badge className='rounded-full border border-border/70 bg-card/70 px-4 py-1.5 text-sm text-foreground'>
                 Clear priorities
               </Badge>
-              <Badge className='rounded-full border border-border bg-background/70 px-4 py-1.5 text-sm text-foreground'>
+              <Badge className='rounded-full border border-border/70 bg-card/70 px-4 py-1.5 text-sm text-foreground'>
                 Instant momentum
               </Badge>
             </div>
           </div>
-          <div className='rounded-[32px] border border-border/60 bg-gradient-to-br from-card/95 via-card/80 to-card/60 p-7 shadow-2xl shadow-emerald-500/15 backdrop-blur sm:p-9'>
-            <div className='space-y-7'>
+          <div className='rounded-[28px] border border-border/70 bg-gradient-to-br from-card/95 via-card/80 to-card/60 p-6 shadow-[0_18px_60px_-40px_rgba(120,72,40,0.5)] backdrop-blur sm:p-8'>
+            <div className='space-y-6'>
               <div className='flex items-center justify-between text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground'>
                 <span>At a glance</span>
                 <span className='rounded-full bg-primary/15 px-3 py-1 text-[10px] text-primary'>
@@ -60,19 +60,19 @@ export const BoardsHome = ({ boards }: BoardsHomeProps) => {
                 </p>
               </div>
               <div className='grid gap-4 sm:grid-cols-2'>
-                <div className='rounded-2xl border border-border/60 bg-card/80 p-4'>
+                <div className='rounded-2xl border border-border/70 bg-background/70 p-4'>
                   <p className='text-xs text-muted-foreground'>Active boards</p>
                   <p className='text-2xl font-semibold'>{boards.length}</p>
                 </div>
-                <div className='rounded-2xl border border-border/60 bg-card/80 p-4'>
+                <div className='rounded-2xl border border-border/70 bg-background/70 p-4'>
                   <p className='text-xs text-muted-foreground'>Total tasks</p>
                   <p className='text-2xl font-semibold'>{taskCount}</p>
                 </div>
-                <div className='rounded-2xl border border-border/60 bg-card/80 p-4'>
+                <div className='rounded-2xl border border-border/70 bg-background/70 p-4'>
                   <p className='text-xs text-muted-foreground'>Columns</p>
                   <p className='text-2xl font-semibold'>{columnCount}</p>
                 </div>
-                <div className='rounded-2xl border border-border/60 bg-card/80 p-4'>
+                <div className='rounded-2xl border border-border/70 bg-background/70 p-4'>
                   <p className='text-xs text-muted-foreground'>Team rhythm</p>
                   <p className='text-2xl font-semibold'>Steady</p>
                 </div>
@@ -81,7 +81,7 @@ export const BoardsHome = ({ boards }: BoardsHomeProps) => {
           </div>
         </header>
 
-        <div className='grid gap-5 sm:grid-cols-2 animate-in fade-in slide-in-from-bottom-4 duration-700'>
+        <div className='grid gap-6 sm:grid-cols-2 animate-in fade-in slide-in-from-bottom-4 duration-700'>
           {boards.map((board) => (
             <BoardSummaryCard
               key={board.id}

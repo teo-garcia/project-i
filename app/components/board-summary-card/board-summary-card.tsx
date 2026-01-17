@@ -16,8 +16,8 @@ export const BoardSummaryCard = ({ board, taskCount }: BoardSummaryCardProps) =>
       href={`/boards/${board.id}`}
       className='group'
     >
-      <Card className='relative overflow-hidden border border-border/60 bg-card/85 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl hover:shadow-emerald-500/15'>
-        <div className='absolute -right-12 top-4 h-24 w-24 rounded-full bg-emerald-200/30 blur-2xl transition-opacity group-hover:opacity-80' />
+      <Card className='relative overflow-hidden border border-border/70 bg-card/90 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_18px_40px_-28px_rgba(120,72,40,0.5)]'>
+        <div className='absolute -right-12 top-4 h-24 w-24 rounded-full bg-blue-200/40 blur-2xl transition-opacity group-hover:opacity-80' />
         <CardHeader className='space-y-3 pb-3'>
           <div className='flex items-start justify-between'>
             <Badge variant='outline' className='border-primary/30 bg-primary/10 text-xs font-medium text-primary'>

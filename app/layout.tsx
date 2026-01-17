@@ -1,7 +1,7 @@
 import '@/lib/styles/globals.css'
 
 import type { Metadata } from 'next'
-import { DM_Sans,Space_Grotesk } from 'next/font/google'
+import { Bricolage_Grotesque, Instrument_Sans } from 'next/font/google'
 
 import { AppShell } from './components/app-shell/app-shell'
 import { GlobalProviders } from './components/global-providers/global-providers'
@@ -13,16 +13,18 @@ export const metadata: Metadata = {
   },
 }
 
-const spaceGrotesk = Space_Grotesk({
+const bricolageGrotesque = Bricolage_Grotesque({
   subsets: ['latin'],
   variable: '--font-heading',
   display: 'swap',
+  weight: ['600', '700'],
 })
 
-const dmSans = DM_Sans({
+const instrumentSans = Instrument_Sans({
   subsets: ['latin'],
   variable: '--font-body',
   display: 'swap',
+  weight: ['400', '500', '600', '700'],
 })
 
 const RootLayout = async (properties: React.PropsWithChildren) => {
@@ -30,7 +32,7 @@ const RootLayout = async (properties: React.PropsWithChildren) => {
   return (
     <html lang='en' suppressHydrationWarning>
       <head />
-      <body className={`${spaceGrotesk.variable} ${dmSans.variable} font-body antialiased`}>
+      <body className={`${bricolageGrotesque.variable} ${instrumentSans.variable} font-body antialiased`}>
         <GlobalProviders>
           <AppShell>{children}</AppShell>
         </GlobalProviders>

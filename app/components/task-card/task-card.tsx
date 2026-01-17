@@ -45,10 +45,10 @@ export const TaskCard = ({ task, boardId, onEdit, onDelete, onDuplicate }: TaskC
   return (
     <div className='group relative'>
       <Link href={`/boards/${boardId}/task/${task.id}`} className='block'>
-        <Card className={`relative overflow-hidden border bg-card/85 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg hover:shadow-emerald-500/15 ${
+        <Card className={`relative overflow-hidden border bg-card/90 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_16px_34px_-24px_rgba(120,72,40,0.45)] ${
           overdue ? 'border-destructive/50' : 'border-border/60'
         }`}>
-          <div className='absolute -right-10 top-3 h-20 w-20 rounded-full bg-emerald-200/30 blur-2xl transition-opacity group-hover:opacity-80' />
+          <div className='absolute -right-10 top-3 h-20 w-20 rounded-full bg-blue-200/40 blur-2xl transition-opacity group-hover:opacity-80' />
 
           {/* Actions Menu - appears on hover */}
           <div className='absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100'>
@@ -84,7 +84,7 @@ export const TaskCard = ({ task, boardId, onEdit, onDelete, onDuplicate }: TaskC
             </DropdownMenu>
           </div>
 
-          <CardContent className='p-3.5'>
+          <CardContent className='p-4'>
             <div className='flex items-start justify-between gap-3'>
               <div className='flex-1 space-y-1.5'>
                 <p className='text-sm font-semibold leading-tight'>
@@ -131,7 +131,7 @@ export const TaskCard = ({ task, boardId, onEdit, onDelete, onDuplicate }: TaskC
           </CardContent>
 
           {/* Card Footer with assignees and due date */}
-          <CardFooter className='border-t border-border/40 bg-muted/20 p-2.5'>
+          <CardFooter className='border-t border-border/50 bg-muted/30 p-3'>
             <div className='flex w-full items-center justify-between'>
               {/* Assignees */}
               <div className='flex -space-x-2'>

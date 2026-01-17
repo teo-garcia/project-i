@@ -78,9 +78,9 @@ export const BoardPage = ({ board }: BoardPageProps) => {
   const filteredColumns = useMemo(() => filterBoardColumns(board, filters), [board, filters])
 
   return (
-    <section className='relative min-h-screen overflow-hidden bg-background px-6 pb-16 pt-16 sm:px-10 sm:pb-20 sm:pt-20'>
+    <section className='relative min-h-screen overflow-hidden bg-background px-6 pb-14 pt-12 sm:px-10 sm:pb-16 sm:pt-14'>
       <GradientOrbs variant='board' />
-      <div className='relative mx-auto flex w-full max-w-7xl flex-col gap-10'>
+      <div className='relative mx-auto flex w-full max-w-7xl flex-col gap-12'>
         <header className='grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] animate-in fade-in slide-in-from-bottom-6 duration-700'>
           <div className='space-y-4'>
             <Link
@@ -101,7 +101,7 @@ export const BoardPage = ({ board }: BoardPageProps) => {
                   onFiltersChange={setFilters}
                 />
               </div>
-              <h1 className='text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl'>
+              <h1 className='text-3xl font-bold leading-[1.05] tracking-tight sm:text-4xl lg:text-5xl'>
                 {board.name}
               </h1>
               <p className='max-w-2xl text-sm text-muted-foreground sm:text-base'>
@@ -109,7 +109,7 @@ export const BoardPage = ({ board }: BoardPageProps) => {
               </p>
             </div>
           </div>
-          <div className='rounded-[32px] border border-border/60 bg-gradient-to-br from-card/95 via-card/80 to-card/60 p-7 shadow-2xl shadow-emerald-500/15 backdrop-blur sm:p-8'>
+          <div className='rounded-[28px] border border-border/70 bg-gradient-to-br from-card/95 via-card/80 to-card/60 p-6 shadow-[0_18px_60px_-40px_rgba(120,72,40,0.5)] backdrop-blur sm:p-8'>
             <div className='space-y-6'>
               <div className='flex items-center justify-between text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground'>
                 <span>Board pulse</span>
@@ -118,19 +118,19 @@ export const BoardPage = ({ board }: BoardPageProps) => {
                 </span>
               </div>
               <div className='grid gap-4 sm:grid-cols-2'>
-                <div className='rounded-2xl border border-border/60 bg-card/80 p-4'>
+                <div className='rounded-2xl border border-border/70 bg-background/70 p-4'>
                   <p className='text-xs text-muted-foreground'>Columns</p>
                   <p className='text-2xl font-semibold'>{board.columns.length}</p>
                 </div>
-                <div className='rounded-2xl border border-border/60 bg-card/80 p-4'>
+                <div className='rounded-2xl border border-border/70 bg-background/70 p-4'>
                   <p className='text-xs text-muted-foreground'>Tasks</p>
                   <p className='text-2xl font-semibold'>{totalTasks}</p>
                 </div>
-                <div className='rounded-2xl border border-border/60 bg-card/80 p-4'>
+                <div className='rounded-2xl border border-border/70 bg-background/70 p-4'>
                   <p className='text-xs text-muted-foreground'>Focus</p>
                   <p className='text-2xl font-semibold'>High</p>
                 </div>
-                <div className='rounded-2xl border border-border/60 bg-card/80 p-4'>
+                <div className='rounded-2xl border border-border/70 bg-background/70 p-4'>
                   <p className='text-xs text-muted-foreground'>Cadence</p>
                   <p className='text-2xl font-semibold'>Daily</p>
                 </div>
@@ -139,10 +139,10 @@ export const BoardPage = ({ board }: BoardPageProps) => {
           </div>
         </header>
 
-        <div className='grid gap-5 lg:grid-cols-3 animate-in fade-in slide-in-from-bottom-4 duration-700'>
+        <div className='grid gap-6 lg:grid-cols-3 animate-in fade-in slide-in-from-bottom-4 duration-700'>
           {filteredColumns.map((column) => (
             <div key={column.id} className='flex flex-col gap-3.5'>
-              <div className='flex items-center justify-between rounded-2xl border border-border/60 bg-card/85 px-4 py-3 shadow-sm'>
+              <div className='flex items-center justify-between rounded-2xl border border-border/70 bg-card/90 px-4 py-3 shadow-[0_10px_24px_-20px_rgba(120,72,40,0.35)]'>
                 <h2 className='text-sm font-semibold'>{column.name}</h2>
                 <span className='text-xs font-medium text-muted-foreground'>
                   {column.tasks.length}

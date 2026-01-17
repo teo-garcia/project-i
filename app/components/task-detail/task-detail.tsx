@@ -21,14 +21,14 @@ type TaskDetailProps = {
 
 export const TaskDetail = ({ task, columnName, boardName }: TaskDetailProps) => {
   return (
-    <div className='space-y-6'>
+    <div className='space-y-7 rounded-2xl border border-border/90 bg-card p-5 sm:p-6'>
       {/* Header */}
       <div className='space-y-3'>
         <Badge variant='outline' className='text-xs font-medium'>
           {boardName} · {columnName}
         </Badge>
-        <h2 className='text-2xl font-bold tracking-tight'>{task.title}</h2>
-        <p className='text-muted-foreground'>{task.description}</p>
+        <h2 className='text-3xl font-bold leading-tight tracking-tight'>{task.title}</h2>
+        <p className='text-base text-muted-foreground'>{task.description}</p>
       </div>
 
       {/* Labels */}
@@ -48,7 +48,7 @@ export const TaskDetail = ({ task, columnName, boardName }: TaskDetailProps) => 
       {/* Metadata */}
       <div className='grid gap-4 sm:grid-cols-2'>
         {/* Due date */}
-        <div className='rounded-lg border border-border bg-muted/30 p-4'>
+        <div className='rounded-xl border border-border/90 bg-background p-4'>
           <div className='flex items-center gap-3'>
             <div className='rounded-md bg-primary/10 p-2'>
               <CalendarDays className='size-4 text-primary' />
@@ -61,7 +61,7 @@ export const TaskDetail = ({ task, columnName, boardName }: TaskDetailProps) => 
         </div>
 
         {/* Assignees count */}
-        <div className='rounded-lg border border-border bg-muted/30 p-4'>
+        <div className='rounded-xl border border-border/90 bg-background p-4'>
           <div className='flex items-center gap-3'>
             <div className='rounded-md bg-primary/10 p-2'>
               <ClipboardList className='size-4 text-primary' />
@@ -80,7 +80,7 @@ export const TaskDetail = ({ task, columnName, boardName }: TaskDetailProps) => 
           <h3 className='text-sm font-semibold'>Team Members</h3>
           <div className='space-y-2'>
             {task.assignees.map((assignee) => (
-              <div key={assignee.id} className='flex items-center gap-3 rounded-lg border border-border bg-muted/30 p-3'>
+              <div key={assignee.id} className='flex items-center gap-3 rounded-xl border border-border/90 bg-background p-3'>
                 <Avatar className='size-9'>
                   <AvatarFallback className='bg-primary text-primary-foreground text-xs font-semibold'>
                     {assignee.initials}

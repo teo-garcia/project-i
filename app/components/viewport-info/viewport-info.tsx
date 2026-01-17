@@ -30,16 +30,17 @@ export const ViewportInfo = () => {
   if (process.env.NODE_ENV === 'production') return null
 
   return (
-    <aside className='fixed bottom-0 right-0 flex items-center gap-x-1 rounded-l-lg px-4 py-2 bg-primary text-primary-foreground font-semibold'>
+    <aside className='fixed bottom-4 right-4 z-30 flex max-w-[calc(100vw-1rem)] items-center gap-x-2 overflow-hidden rounded-full border border-border/80 bg-background/90 px-3 py-1.5 text-foreground shadow-lg backdrop-blur-sm pointer-events-none'>
       <RulerIcon className='size-5' />
-      <p className='text-lg flex gap-x-2'>
-        {viewportWidth}px - {viewportHeight}px -
-        <span className='inline sm:hidden font-semibold'>default</span>
-        <span className='hidden sm:inline md:hidden font-semibold'>sm</span>
-        <span className='hidden md:inline lg:hidden font-semibold'>md</span>
-        <span className='hidden lg:inline xl:hidden font-semibold'>lg </span>
-        <span className='hidden xl:inline 2xl:hidden font-semibold'>xl</span>
-        <span className='hidden 2xl:inline font-semibold'>2xl</span>
+      <p className='flex items-center gap-x-2 text-xs font-semibold sm:text-sm'>
+        <span className='truncate'>{viewportWidth}x{viewportHeight}</span>
+        <span className='text-muted-foreground'>|</span>
+        <span className='inline sm:hidden'>default</span>
+        <span className='hidden sm:inline md:hidden'>sm</span>
+        <span className='hidden md:inline lg:hidden'>md</span>
+        <span className='hidden lg:inline xl:hidden'>lg</span>
+        <span className='hidden xl:inline 2xl:hidden'>xl</span>
+        <span className='hidden 2xl:inline'>2xl</span>
       </p>
     </aside>
   )
