@@ -44,8 +44,8 @@ pnpm dev
 3. ✅ Kanban UI + task detail modal
 4. ✅ Enhanced UI + theme integration + filtering
 5. ✅ Extract business logic into lib modules
-6. 🔄 Drag-and-drop and optimistic UI
-7. ⏳ Prisma schema + SQLite wiring
+6. ✅ Drag-and-drop and optimistic UI
+7. ✅ Prisma schema + SQLite wiring
 8. ⏳ Server Actions for CRUD
 9. ⏳ Task metadata + Zod validation
 10. ⏳ Polish + accessibility
@@ -288,22 +288,50 @@ countBoardTasks(board: Board): number
 
 ---
 
-### Step 5 - Drag-and-Drop Interactions 🔄
+### Step 5 - Drag-and-Drop Interactions ✅
 
-**Status:** Not started (next step)
+**Lesson:** Keep DnD logic client-only and isolate state updates for snappy UX.
 
-**Lesson:** DnD should be client-only and isolated to avoid server rerenders.
+**Deliverables:**
 
-**Goal:**
+- ✅ Task reordering within columns
+- ✅ Moving tasks between columns
+- ✅ Optimistic UI updates
+- ✅ Visual feedback during drag operations
 
-- Allow moving tasks between columns and reordering
-- Implement optimistic UI updates
+**Key files:**
 
-**Planned deliverables:**
+- `app/components/board-page/board-page.tsx`
+- `app/components/task-card/task-card.tsx`
+- `app/lib/board/dnd.ts`
 
-- DnD with `@dnd-kit` for tasks
-- Optimistic UI updates on move
-- Visual feedback during drag operations
+---
+
+### Step 6 - Prisma + SQLite Setup ✅
+
+**Lesson:** Prisma v7 uses driver adapters for SQLite and a generated client
+output folder that you import from.
+
+**Deliverables:**
+
+- ✅ Prisma init with SQLite datasource
+- ✅ Schema for boards, columns, tasks, labels, assignees
+- ✅ SQLite migrations and local `dev.db`
+- ✅ Seed script with `tsx` and Prisma Client adapter
+
+**What we learned:**
+
+- `prisma migrate dev` is interactive and creates the SQLite file
+- `prisma db seed` runs only when explicitly invoked in Prisma v7
+- SQLite does not support `skipDuplicates` in `createMany`
+- `connect({ name })` requires `name` to be unique in the schema
+
+**Key files:**
+
+- `prisma/schema.prisma`
+- `prisma/seed.ts`
+- `prisma.config.ts`
+- `lib/prisma.ts`
 
 ---
 
@@ -558,6 +586,8 @@ app/
 9. **Memoization prevents waste** - Use `useMemo` for expensive
    filtering/computation
 10. **oklch colors interpolate better** - Especially for dark mode transitions
+11. **Prisma v7 + SQLite** - Use driver adapters and import the generated client
+    from `generated/prisma`
 
 ---
 
@@ -636,7 +666,7 @@ This will teach us about:
 
 ---
 
-**Last updated:** After completing Step 4.5 (Enhanced UI & Features)
+**Last updated:** After completing Step 6 (Prisma + SQLite setup)
 
 Built while learning Next.js incrementally. This document is continuously
 updated with each implementation step.

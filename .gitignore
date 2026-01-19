@@ -42,3 +42,13 @@ yarn-error.log*
 /test-results/
 /playwright-report/
 /playwright/.cache/
+
+/generated/prisma
+dev.db
+dev.db-journal
+prisma/dev.db
+prisma/dev.db-journal
+prisma/dev.db
+prisma/dev.db-journal
+
+/generated/prisma
