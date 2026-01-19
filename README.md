@@ -46,7 +46,7 @@ pnpm dev
 5. ✅ Extract business logic into lib modules
 6. ✅ Drag-and-drop and optimistic UI
 7. ✅ Prisma schema + SQLite wiring
-8. ⏳ Server Actions for CRUD
+8. 🔄 Server Actions for CRUD
 9. ⏳ Task metadata + Zod validation
 10. ⏳ Polish + accessibility
 11. ⏳ Optional: sharing + real-time ordering
@@ -335,6 +335,25 @@ output folder that you import from.
 
 ---
 
+### Step 7 - Server Actions for CRUD 🔄
+
+**Lesson:** Keep reads in server-only modules and use server actions to persist
+changes while the client stays optimistic.
+
+**In progress:**
+
+- 🔄 Server-only data access via Prisma
+- 🔄 Task move persistence with server actions + revalidation
+- 🔄 CRUD server actions for boards and tasks
+
+**Key files:**
+
+- `app/lib/db/boards.ts`
+- `app/lib/actions/board-actions.ts`
+- `app/lib/actions/task-actions.ts`
+
+---
+
 ## 🎓 Key Next.js Concepts Learned
 
 ### 1. App Router Architecture
@@ -588,6 +607,8 @@ app/
 10. **oklch colors interpolate better** - Especially for dark mode transitions
 11. **Prisma v7 + SQLite** - Use driver adapters and import the generated client
     from `generated/prisma`
+12. **Server actions** - Use `revalidatePath` after mutations to refresh server
+    data
 
 ---
 
@@ -648,25 +669,23 @@ app/
 
 ## 🎯 What's Next
 
-**Immediate next step:** Step 5 - Drag-and-Drop Interactions
+**Immediate next step:** Step 7 - Server Actions for CRUD
 
 We'll implement:
 
-- Task reordering within columns
-- Moving tasks between columns
-- Optimistic UI updates
-- Visual feedback during drag operations
-- Using `@dnd-kit` library
+- Task create/update/delete via server actions
+- Board create/update/delete via server actions
+- Revalidation patterns to keep UI fresh
 
 This will teach us about:
 
-- Client-side state management for DnD
-- Optimistic updates before server confirmation
-- Complex interaction patterns in React
+- Server Actions API and execution model
+- Server-only data modules
+- Keeping optimistic UI in sync with the database
 
 ---
 
-**Last updated:** After completing Step 6 (Prisma + SQLite setup)
+**Last updated:** After starting Step 7 (Server Actions for CRUD)
 
 Built while learning Next.js incrementally. This document is continuously
 updated with each implementation step.

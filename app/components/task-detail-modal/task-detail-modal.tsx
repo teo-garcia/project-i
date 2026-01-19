@@ -1,7 +1,6 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { use } from 'react'
 
 import { TaskDetail } from '@/components/task-detail/task-detail'
 import { TaskNotFound } from '@/components/task-not-found/task-not-found'
@@ -11,16 +10,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { getTaskById } from '@/lib/data/task-board'
+import type { Task } from '@/lib/data/task-board'
 
 type TaskDetailModalProps = {
-  params: Promise<{ id: string; taskId: string }>
+  task: Task | null
+  columnName?: string
+  boardName?: string
 }
 
-export const TaskDetailModal = ({ params }: TaskDetailModalProps) => {
+export const TaskDetailModal = ({
+  task,
+  columnName,
+  boardName,
+}: TaskDetailModalProps) => {
   const router = useRouter()
-  const { id, taskId } = use(params)
-  const result = getTaskById(id, taskId)
 
   return (
     <Dialog open onOpenChange={() => router.back()}>
@@ -28,11 +31,11 @@ export const TaskDetailModal = ({ params }: TaskDetailModalProps) => {
         <DialogHeader>
           <DialogTitle className='sr-only'>Task details</DialogTitle>
         </DialogHeader>
-        {result ? (
+        {task && columnName && boardName ? (
           <TaskDetail
-            task={result.task}
-            columnName={result.column.name}
-            boardName={result.board.name}
+            task={task}
+            columnName={columnName}
+            boardName={boardName}
           />
         ) : (
           <TaskNotFound />

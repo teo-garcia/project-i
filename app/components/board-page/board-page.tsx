@@ -19,7 +19,7 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
-import { type ReactNode, useMemo, useState } from 'react'
+import { type ReactNode, useMemo, useState, useTransition } from 'react'
 
 import { BoardFilters } from '@/components/board-filters/board-filters'
 import { EmptyState } from '@/components/empty-state/empty-state'
@@ -27,9 +27,11 @@ import { FloatingActionButton } from '@/components/floating-action-button/floati
 import { GradientOrbs } from '@/components/gradient-orbs/gradient-orbs'
 import { TaskCard } from '@/components/task-card/task-card'
 import { Badge } from '@/components/ui/badge'
+import { moveTaskAction } from '@/lib/actions/task-actions'
 import {
   findTaskById,
   fromTaskId,
+  getDropTarget,
   isTaskDragId,
   moveTask,
   toColumnId,
@@ -216,6 +218,7 @@ export const BoardPage = ({ board }: BoardPageProps) => {
   )
   const [columns, setColumns] = useState<Board['columns']>(board.columns)
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null)
+  const [, startTransition] = useTransition()
 
   const totalTasks = columns.reduce(
     (total, column) => total + column.tasks.length,
@@ -256,7 +259,31 @@ export const BoardPage = ({ board }: BoardPageProps) => {
       return
     }
 
-    setColumns((current) => moveTask(current, activeId, overId))
+    setColumns((current) => {
+      const target = getDropTarget(current, overId)
+      const targetColumn = target.columnId
+        ? current.find((column) => column.id === target.columnId)
+        : null
+
+      if (!targetColumn) {
+        return current
+      }
+
+      const targetIndex = target.taskId
+        ? targetColumn.tasks.findIndex((task) => task.id === target.taskId)
+        : targetColumn.tasks.length
+
+      startTransition(() => {
+        void moveTaskAction({
+          boardId: board.id,
+          taskId: fromTaskId(activeId),
+          toColumnId: targetColumn.id,
+          toIndex: targetIndex === -1 ? targetColumn.tasks.length : targetIndex,
+        })
+      })
+
+      return moveTask(current, activeId, overId)
+    })
     setActiveTaskId(null)
   }
 

@@ -2,15 +2,17 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
 import { TaskDetailPage } from '@/components/task-detail-page/task-detail-page'
-import { getTaskById } from '@/lib/data/task-board'
+import { fetchTaskById } from '@/lib/db/boards'
 
 type TaskPageProps = {
   params: Promise<{ id: string; taskId: string }>
 }
 
-export const generateMetadata = async (props: TaskPageProps): Promise<Metadata> => {
+export const generateMetadata = async (
+  props: TaskPageProps
+): Promise<Metadata> => {
   const { id, taskId } = await props.params
-  const result = getTaskById(id, taskId)
+  const result = await fetchTaskById(id, taskId)
 
   if (!result) {
     return { title: 'Task not found | Task Board' }
@@ -24,7 +26,7 @@ export const generateMetadata = async (props: TaskPageProps): Promise<Metadata> 
 
 const TaskPage = async (props: TaskPageProps) => {
   const { id, taskId } = await props.params
-  const result = getTaskById(id, taskId)
+  const result = await fetchTaskById(id, taskId)
 
   if (!result) {
     notFound()

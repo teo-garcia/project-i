@@ -2,15 +2,17 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
 import { BoardPage } from '@/components/board-page/board-page'
-import { getBoardById } from '@/lib/data/task-board'
+import { fetchBoardById } from '@/lib/db/boards'
 
 type BoardPageProps = {
   params: Promise<{ id: string }>
 }
 
-export const generateMetadata = async (props: BoardPageProps): Promise<Metadata> => {
+export const generateMetadata = async (
+  props: BoardPageProps
+): Promise<Metadata> => {
   const { id } = await props.params
-  const board = getBoardById(id)
+  const board = await fetchBoardById(id)
 
   if (!board) {
     return {
@@ -26,7 +28,7 @@ export const generateMetadata = async (props: BoardPageProps): Promise<Metadata>
 
 const BoardRoutePage = async (props: BoardPageProps) => {
   const { id } = await props.params
-  const board = getBoardById(id)
+  const board = await fetchBoardById(id)
 
   if (!board) {
     notFound()
