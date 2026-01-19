@@ -9,7 +9,7 @@ import { GlobalProviders } from './components/global-providers/global-providers'
 export const metadata: Metadata = {
   title: {
     default: 'Home',
-    template: '%s | RTN',
+    template: '%s',
   },
 }
 
@@ -27,14 +27,25 @@ const instrumentSans = Instrument_Sans({
   weight: ['400', '500', '600', '700'],
 })
 
-const RootLayout = async (properties: React.PropsWithChildren) => {
-  const { children } = properties
+type RootLayoutProps = {
+  children: React.ReactNode
+  modal: React.ReactNode
+}
+
+const RootLayout = async ({ children, modal }: RootLayoutProps) => {
   return (
     <html lang='en' suppressHydrationWarning>
       <head />
-      <body className={`${bricolageGrotesque.variable} ${instrumentSans.variable} font-body antialiased`}>
+      <body
+        className={`${bricolageGrotesque.variable} ${instrumentSans.variable} font-body antialiased`}
+      >
         <GlobalProviders>
-          <AppShell>{children}</AppShell>
+          <AppShell>
+            <>
+              {children}
+              {modal}
+            </>
+          </AppShell>
         </GlobalProviders>
       </body>
     </html>

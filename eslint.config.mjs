@@ -4,7 +4,10 @@ import react from '@teo-garcia/eslint-config-shared/react'
 
 export default [
   {
-    ignores: ['app/generated/prisma/**', 'prisma/migrations/**'],
+    ignores: [
+      'app/generated/prisma/**',
+      'generated/prisma/**',
+    ],
   },
   ...base,
   ...react,

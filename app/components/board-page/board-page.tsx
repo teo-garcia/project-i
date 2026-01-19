@@ -19,7 +19,13 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
-import { type ReactNode, useMemo, useState, useTransition } from 'react'
+import {
+  type ReactNode,
+  useEffect,
+  useMemo,
+  useState,
+  useTransition,
+} from 'react'
 
 import { BoardFilters } from '@/components/board-filters/board-filters'
 import { EmptyState } from '@/components/empty-state/empty-state'
@@ -86,11 +92,11 @@ const SortableTaskCard = ({ task, boardId }: SortableTaskCardProps) => {
         onEdit={() => console.log('Edit task:', task.id)}
         onDelete={() => console.log('Delete task:', task.id)}
         onDuplicate={() => console.log('Duplicate task:', task.id)}
-        dragHandleProps={{
+        dragProps={{
           ...attributes,
           ...listeners,
         }}
-        dragHandleRef={setActivatorNodeRef}
+        dragRef={setActivatorNodeRef}
       />
     </div>
   )
@@ -224,6 +230,12 @@ export const BoardPage = ({ board }: BoardPageProps) => {
     (total, column) => total + column.tasks.length,
     0
   )
+
+  // Keep DnD state in sync after server refreshes (e.g., task created via modal).
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- local DnD state must reset when board data changes.
+    setColumns(board.columns)
+  }, [board.columns])
 
   const allLabels = useMemo(() => collectBoardLabels(board), [board])
   const filteredColumns = useMemo(
@@ -387,7 +399,7 @@ export const BoardPage = ({ board }: BoardPageProps) => {
         </DndContext>
       </div>
 
-      <FloatingActionButton />
+      <FloatingActionButton boardId={board.id} />
     </section>
   )
 }

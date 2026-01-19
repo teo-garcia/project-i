@@ -1,8 +1,10 @@
-import { LayoutGrid } from 'lucide-react'
+import { LayoutGrid, Plus } from 'lucide-react'
+import Link from 'next/link'
 
 import { BoardSummaryCard } from '@/components/board-summary-card/board-summary-card'
 import { GradientOrbs } from '@/components/gradient-orbs/gradient-orbs'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import type { Board } from '@/lib/data/task-board'
 import { countBoardTasks } from '@/lib/data/task-board'
 
@@ -50,6 +52,16 @@ export const BoardsHome = ({ boards }: BoardsHomeProps) => {
               <Badge className='rounded-full border border-border/70 bg-card/70 px-4 py-1.5 text-sm text-foreground'>
                 Instant momentum
               </Badge>
+              <Button
+                asChild
+                size='sm'
+                className='rounded-full border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20'
+              >
+                <Link href='/boards/new' className='flex items-center gap-2'>
+                  <Plus className='size-4' />
+                  New board
+                </Link>
+              </Button>
             </div>
           </div>
           <div className='rounded-[28px] border border-border/70 bg-gradient-to-br from-card/95 via-card/80 to-card/60 p-6 shadow-[0_18px_60px_-40px_rgba(120,72,40,0.5)] backdrop-blur sm:p-8'>

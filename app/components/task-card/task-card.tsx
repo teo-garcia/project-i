@@ -40,8 +40,8 @@ type TaskCardProps = {
   onEdit?: () => void
   onDelete?: () => void
   onDuplicate?: () => void
-  dragHandleProps?: React.ButtonHTMLAttributes<HTMLButtonElement>
-  dragHandleRef?: React.Ref<HTMLButtonElement>
+  dragProps?: React.HTMLAttributes<HTMLDivElement>
+  dragRef?: React.Ref<HTMLDivElement>
   interactive?: boolean
 }
 
@@ -57,14 +57,12 @@ export const TaskCard = ({
   onEdit,
   onDelete,
   onDuplicate,
-  dragHandleProps,
-  dragHandleRef,
+  dragProps,
+  dragRef,
   interactive = true,
 }: TaskCardProps) => {
   const overdue = isTaskOverdue(task.dueDate)
   const dueSoon = isTaskDueSoon(task.dueDate)
-  const { onClick: onDragHandleClick, ...restDragHandleProps } =
-    dragHandleProps ?? {}
 
   const card = (
     <Card
@@ -74,20 +72,10 @@ export const TaskCard = ({
     >
       <div className='absolute -right-10 top-3 h-20 w-20 rounded-full bg-blue-200/40 blur-2xl transition-opacity group-hover:opacity-80' />
 
-      <button
-        type='button'
-        className='absolute left-2 top-2 inline-flex size-7 items-center justify-center rounded-md border border-border/60 bg-background/80 text-muted-foreground opacity-60 transition hover:opacity-100'
-        aria-label='Drag task'
-        ref={dragHandleRef}
-        {...restDragHandleProps}
-        onClick={(event) => {
-          event.preventDefault()
-          event.stopPropagation()
-          onDragHandleClick?.(event)
-        }}
-      >
-        <GripVertical className='size-4' />
-      </button>
+      <div className='absolute left-3 top-3 inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground/70'>
+        <GripVertical className='size-3.5 opacity-70' />
+        Drag
+      </div>
 
       {/* Actions Menu - appears on hover */}
       <div className='absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100'>
@@ -223,7 +211,11 @@ export const TaskCard = ({
   )
 
   return (
-    <div className='group relative'>
+    <div
+      ref={dragRef}
+      {...dragProps}
+      className='group relative cursor-grab active:cursor-grabbing'
+    >
       {interactive ? (
         <Link href={`/boards/${boardId}/task/${task.id}`} className='block'>
           {card}

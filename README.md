@@ -342,15 +342,20 @@ changes while the client stays optimistic.
 
 **In progress:**
 
-- 🔄 Server-only data access via Prisma
-- 🔄 Task move persistence with server actions + revalidation
+- ✅ Server-only data access via Prisma
+- ✅ Task move persistence with server actions + revalidation
 - 🔄 CRUD server actions for boards and tasks
+- 🔄 Create flows via intercepting routes
 
 **Key files:**
 
 - `app/lib/db/boards.ts`
 - `app/lib/actions/board-actions.ts`
 - `app/lib/actions/task-actions.ts`
+- `app/boards/new/page.tsx`
+- `app/boards/[id]/task/new/page.tsx`
+- `app/@modal/(.)boards/new/page.tsx`
+- `app/boards/[id]/@modal/(.)task/new/page.tsx`
 
 ---
 

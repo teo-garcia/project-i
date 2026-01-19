@@ -1,3 +1,4 @@
+import 'server-only'
 import 'dotenv/config'
 
 import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3'

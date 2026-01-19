@@ -2,7 +2,9 @@
 
 import { revalidatePath } from 'next/cache'
 
-import { prisma } from '../../../lib/prisma'
+import { prisma } from '@/lib/prisma'
+import { boardCreateSchema } from '@/lib/validation/schemas'
+import { formatZodErrors } from '@/lib/validation/utils'
 
 type CreateBoardInput = {
   name: string
@@ -10,11 +12,20 @@ type CreateBoardInput = {
   columns?: string[]
 }
 
-export const createBoardAction = async ({
-  name,
-  description,
-  columns = [],
-}: CreateBoardInput) => {
+type CreateBoardResult =
+  | { ok: true; boardId: string }
+  | { ok: false; errors: Record<string, string> }
+
+export const createBoardAction = async (
+  input: CreateBoardInput
+): Promise<CreateBoardResult> => {
+  const parsed = boardCreateSchema.safeParse(input)
+
+  if (!parsed.success) {
+    return { ok: false, errors: formatZodErrors(parsed.error) }
+  }
+
+  const { name, description, columns = [] } = parsed.data
   const board = await prisma.board.create({
     data: {
       name,
@@ -31,7 +42,7 @@ export const createBoardAction = async ({
   revalidatePath('/')
   revalidatePath(`/boards/${board.id}`)
 
-  return board.id
+  return { ok: true, boardId: board.id }
 }
 
 type UpdateBoardInput = {

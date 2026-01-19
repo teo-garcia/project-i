@@ -3,8 +3,9 @@
 import { revalidatePath } from 'next/cache'
 
 import type { TaskPriority } from '@/lib/data/task-board'
-
-import { prisma } from '../../../lib/prisma'
+import { prisma } from '@/lib/prisma'
+import { taskCreateSchema, taskMoveSchema } from '@/lib/validation/schemas'
+import { formatZodErrors } from '@/lib/validation/utils'
 
 type MoveTaskInput = {
   boardId: string
@@ -35,6 +36,17 @@ export const moveTaskAction = async ({
   toColumnId,
   toIndex,
 }: MoveTaskInput) => {
+  const parsed = taskMoveSchema.safeParse({
+    boardId,
+    taskId,
+    toColumnId,
+    toIndex,
+  })
+
+  if (!parsed.success) {
+    return
+  }
+
   await prisma.$transaction(async (tx) => {
     const task = await tx.task.findUnique({
       where: { id: taskId },
@@ -96,16 +108,29 @@ type CreateTaskInput = {
   assignees?: { name: string; initials: string }[]
 }
 
-export const createTaskAction = async ({
-  boardId,
-  columnId,
-  title,
-  description,
-  dueDate,
-  priority = 'medium',
-  labels = [],
-  assignees = [],
-}: CreateTaskInput) => {
+type CreateTaskResult =
+  | { ok: true }
+  | { ok: false; errors: Record<string, string> }
+
+export const createTaskAction = async (
+  input: CreateTaskInput
+): Promise<CreateTaskResult> => {
+  const parsed = taskCreateSchema.safeParse(input)
+
+  if (!parsed.success) {
+    return { ok: false, errors: formatZodErrors(parsed.error) }
+  }
+
+  const {
+    boardId,
+    columnId,
+    title,
+    description,
+    dueDate,
+    priority,
+    labels = [],
+    assignees = [],
+  } = parsed.data
   const lastTask = await prisma.task.findFirst({
     where: { columnId },
     orderBy: { order: 'desc' },
@@ -149,6 +174,7 @@ export const createTaskAction = async ({
   })
 
   revalidatePath(`/boards/${boardId}`)
+  return { ok: true }
 }
 
 type UpdateTaskInput = {

@@ -8,7 +8,7 @@ import type {
 } from '@/lib/data/task-board'
 
 import { Prisma } from '../../../generated/prisma/client'
-import { prisma } from '../../../lib/prisma'
+import { prisma } from '../prisma'
 
 type TaskWithRelations = Prisma.TaskGetPayload<{
   include: {

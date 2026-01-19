@@ -1,6 +1,6 @@
 'use client'
 
-import { Bell, LayoutGrid, Plus, Search, User } from 'lucide-react'
+import { LayoutGrid, User } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -20,7 +20,7 @@ export const AppHeader = () => {
   const isHomePage = pathname === '/'
 
   return (
-    <header className='sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl'>
+    <header className='sticky top-0 z-50 border-b border-border/40 bg-background/70 backdrop-blur'>
       <div className='app-container flex h-16 items-center justify-between'>
         {/* Logo and Nav */}
         <div className='flex items-center gap-8'>
@@ -46,33 +46,7 @@ export const AppHeader = () => {
         </div>
 
         {/* Actions */}
-        <div className='flex items-center gap-3'>
-          {/* Search */}
-          <Button
-            variant='outline'
-            size='sm'
-            className='hidden h-9 gap-2 bg-muted/30 sm:flex'
-          >
-            <Search className='size-4' />
-            <span className='text-muted-foreground'>Search</span>
-            <kbd className='ml-2 rounded border border-border bg-background px-1.5 text-xs text-muted-foreground'>
-              ⌘K
-            </kbd>
-          </Button>
-
-          {/* New Task Button */}
-          <Button size='sm' className='h-9 gap-2 shadow-lg shadow-primary/20'>
-            <Plus className='size-4' />
-            <span className='hidden sm:inline'>New Task</span>
-          </Button>
-
-          {/* Notifications */}
-          <Button variant='ghost' size='icon' className='relative h-9 w-9'>
-            <Bell className='size-4' />
-            <span className='absolute right-1.5 top-1.5 size-2 rounded-full bg-primary' />
-          </Button>
-
-          {/* Theme Switch */}
+        <div className='flex items-center gap-2'>
           <ThemeSwitch />
 
           {/* User Menu */}
