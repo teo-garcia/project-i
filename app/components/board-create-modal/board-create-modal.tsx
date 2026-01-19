@@ -1,7 +1,5 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
-
 import { BoardCreateForm } from '@/components/board-create-form/board-create-form'
 import {
   Dialog,
@@ -10,18 +8,19 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 
-export const BoardCreateModal = () => {
-  const router = useRouter()
+type BoardCreateModalProps = {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onSuccess?: (boardId: string) => void
+}
 
+export const BoardCreateModal = ({
+  open,
+  onOpenChange,
+  onSuccess,
+}: BoardCreateModalProps) => {
   return (
-    <Dialog
-      onOpenChange={(nextOpen) => {
-        if (!nextOpen) {
-          router.back()
-        }
-      }}
-      open
-    >
+    <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogContent className='max-w-2xl border-border/90 bg-background p-6 sm:p-8'>
         <DialogHeader>
           <DialogTitle className='text-2xl font-semibold'>
@@ -29,11 +28,10 @@ export const BoardCreateModal = () => {
           </DialogTitle>
         </DialogHeader>
         <BoardCreateForm
-          onCancel={() => router.back()}
+          onCancel={() => onOpenChange(false)}
           onSuccess={(boardId) => {
-            router.back()
-            router.replace(`/boards/${boardId}`)
-            router.refresh()
+            onSuccess?.(boardId)
+            onOpenChange(false)
           }}
         />
       </DialogContent>

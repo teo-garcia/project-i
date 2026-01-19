@@ -29,10 +29,9 @@ const instrumentSans = Instrument_Sans({
 
 type RootLayoutProps = {
   children: React.ReactNode
-  modal: React.ReactNode
 }
 
-const RootLayout = async ({ children, modal }: RootLayoutProps) => {
+const RootLayout = async ({ children }: RootLayoutProps) => {
   return (
     <html lang='en' suppressHydrationWarning>
       <head />
@@ -40,12 +39,7 @@ const RootLayout = async ({ children, modal }: RootLayoutProps) => {
         className={`${bricolageGrotesque.variable} ${instrumentSans.variable} font-body antialiased`}
       >
         <GlobalProviders>
-          <AppShell>
-            <>
-              {children}
-              {modal}
-            </>
-          </AppShell>
+          <AppShell>{children}</AppShell>
         </GlobalProviders>
       </body>
     </html>

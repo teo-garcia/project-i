@@ -1,6 +1,10 @@
-import { LayoutGrid, Plus } from 'lucide-react'
-import Link from 'next/link'
+'use client'
 
+import { LayoutGrid, Plus } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+
+import { BoardCreateModal } from '@/components/board-create-modal/board-create-modal'
 import { BoardSummaryCard } from '@/components/board-summary-card/board-summary-card'
 import { GradientOrbs } from '@/components/gradient-orbs/gradient-orbs'
 import { Badge } from '@/components/ui/badge'
@@ -13,6 +17,8 @@ type BoardsHomeProps = {
 }
 
 export const BoardsHome = ({ boards }: BoardsHomeProps) => {
+  const router = useRouter()
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
   const taskCount = boards.reduce(
     (total, board) => total + countBoardTasks(board),
     0
@@ -53,14 +59,14 @@ export const BoardsHome = ({ boards }: BoardsHomeProps) => {
                 Instant momentum
               </Badge>
               <Button
-                asChild
                 size='sm'
                 className='rounded-full border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20'
+                onClick={() => setIsCreateOpen(true)}
               >
-                <Link href='/boards/new' className='flex items-center gap-2'>
+                <span className='flex items-center gap-2'>
                   <Plus className='size-4' />
                   New board
-                </Link>
+                </span>
               </Button>
             </div>
           </div>
@@ -110,6 +116,15 @@ export const BoardsHome = ({ boards }: BoardsHomeProps) => {
           ))}
         </div>
       </div>
+      <BoardCreateModal
+        open={isCreateOpen}
+        onOpenChange={setIsCreateOpen}
+        onSuccess={(boardId) => {
+          setIsCreateOpen(false)
+          router.push(`/boards/${boardId}`)
+          router.refresh()
+        }}
+      />
     </section>
   )
 }

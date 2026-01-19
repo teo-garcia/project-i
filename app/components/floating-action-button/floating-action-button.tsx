@@ -2,6 +2,7 @@
 
 import { Plus, Sparkles } from 'lucide-react'
 import Link from 'next/link'
+import type { ReactNode } from 'react'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -14,12 +15,69 @@ import {
 
 type FloatingActionButtonProps = {
   boardId?: string
+  onNewTask?: () => void
+  onNewBoard?: () => void
 }
 
 export const FloatingActionButton = ({
   boardId,
+  onNewTask,
+  onNewBoard,
 }: FloatingActionButtonProps) => {
   const [open, setOpen] = useState(false)
+  const shouldShowTaskAction = Boolean(boardId)
+  const useTaskModal = Boolean(boardId && onNewTask)
+  const useBoardModal = Boolean(onNewBoard)
+  let taskAction: ReactNode = null
+  let boardAction: ReactNode
+
+  if (shouldShowTaskAction) {
+    taskAction = useTaskModal ? (
+        <DropdownMenuItem
+          onSelect={() => {
+            setOpen(false)
+            onNewTask?.()
+          }}
+          className='flex cursor-pointer items-center gap-2 rounded-xl px-2.5 py-2 text-sm'
+        >
+          <Plus className='size-4' />
+          New task
+        </DropdownMenuItem>
+      ) : (
+        <DropdownMenuItem asChild>
+          <Link
+            href={`/boards/${boardId}/task/new`}
+            className='flex cursor-pointer items-center gap-2 rounded-xl px-2.5 py-2 text-sm'
+          >
+            <Plus className='size-4' />
+            New task
+          </Link>
+        </DropdownMenuItem>
+      );
+  }
+
+  boardAction = useBoardModal ? (
+      <DropdownMenuItem
+        onSelect={() => {
+          setOpen(false)
+          onNewBoard?.()
+        }}
+        className='flex cursor-pointer items-center gap-2 rounded-xl px-2.5 py-2 text-sm'
+      >
+        <Plus className='size-4' />
+        New board
+      </DropdownMenuItem>
+    ) : (
+      <DropdownMenuItem asChild>
+        <Link
+          href='/boards/new'
+          className='flex cursor-pointer items-center gap-2 rounded-xl px-2.5 py-2 text-sm'
+        >
+          <Plus className='size-4' />
+          New board
+        </Link>
+      </DropdownMenuItem>
+    );
 
   return (
     <div className='fixed bottom-24 right-6 z-40 sm:bottom-28 sm:right-8'>
@@ -40,26 +98,8 @@ export const FloatingActionButton = ({
           collisionPadding={12}
           className='w-52 max-w-[calc(100vw-1.5rem)] rounded-2xl border border-border/80 bg-popover/95 p-1.5 shadow-lg backdrop-blur'
         >
-          {boardId ? (
-            <DropdownMenuItem asChild>
-              <Link
-                href={`/boards/${boardId}/task/new`}
-                className='flex cursor-pointer items-center gap-2 rounded-xl px-2.5 py-2 text-sm'
-              >
-                <Plus className='size-4' />
-                New task
-              </Link>
-            </DropdownMenuItem>
-          ) : null}
-          <DropdownMenuItem asChild>
-            <Link
-              href='/boards/new'
-              className='flex cursor-pointer items-center gap-2 rounded-xl px-2.5 py-2 text-sm'
-            >
-              <Plus className='size-4' />
-              New board
-            </Link>
-          </DropdownMenuItem>
+          {taskAction}
+          {boardAction}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

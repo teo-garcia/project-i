@@ -40,6 +40,7 @@ type TaskCardProps = {
   onEdit?: () => void
   onDelete?: () => void
   onDuplicate?: () => void
+  onOpen?: () => void
   dragProps?: React.HTMLAttributes<HTMLDivElement>
   dragRef?: React.Ref<HTMLDivElement>
   interactive?: boolean
@@ -57,6 +58,7 @@ export const TaskCard = ({
   onEdit,
   onDelete,
   onDuplicate,
+  onOpen,
   dragProps,
   dragRef,
   interactive = true,
@@ -85,7 +87,10 @@ export const TaskCard = ({
               variant='ghost'
               size='icon'
               className='size-7 rounded-md bg-background/90 backdrop-blur-sm hover:bg-background'
-              onClick={(e) => e.preventDefault()}
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+              }}
             >
               <MoreVertical className='size-3.5' />
             </Button>
@@ -210,19 +215,31 @@ export const TaskCard = ({
     </Card>
   )
 
+  let content: React.ReactNode
+
+  if (!interactive) {
+    content = card
+  } else if (onOpen) {
+    content = (
+      <button type='button' onClick={onOpen} className='block w-full text-left'>
+        {card}
+      </button>
+    )
+  } else {
+    content = (
+      <Link href={`/boards/${boardId}/task/${task.id}`} className='block'>
+        {card}
+      </Link>
+    )
+  }
+
   return (
     <div
       ref={dragRef}
       {...dragProps}
       className='group relative cursor-grab active:cursor-grabbing'
     >
-      {interactive ? (
-        <Link href={`/boards/${boardId}/task/${task.id}`} className='block'>
-          {card}
-        </Link>
-      ) : (
-        card
-      )}
+      {content}
     </div>
   )
 }

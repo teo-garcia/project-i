@@ -1,7 +1,5 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
-
 import { TaskDetail } from '@/components/task-detail/task-detail'
 import { TaskNotFound } from '@/components/task-not-found/task-not-found'
 import {
@@ -16,17 +14,19 @@ type TaskDetailModalProps = {
   task: Task | null
   columnName?: string
   boardName?: string
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
 export const TaskDetailModal = ({
   task,
   columnName,
   boardName,
+  open,
+  onOpenChange,
 }: TaskDetailModalProps) => {
-  const router = useRouter()
-
   return (
-    <Dialog open onOpenChange={() => router.back()}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='max-w-5xl border-border/90 bg-background p-6 sm:p-8'>
         <DialogHeader>
           <DialogTitle className='sr-only'>Task details</DialogTitle>

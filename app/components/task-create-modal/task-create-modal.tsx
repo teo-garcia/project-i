@@ -1,7 +1,5 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
-
 import { TaskCreateForm } from '@/components/task-create-form/task-create-form'
 import {
   Dialog,
@@ -13,20 +11,20 @@ import {
 type TaskCreateModalProps = {
   boardId: string
   columns: { id: string; name: string }[]
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onSuccess?: () => void
 }
 
-export const TaskCreateModal = ({ boardId, columns }: TaskCreateModalProps) => {
-  const router = useRouter()
-
+export const TaskCreateModal = ({
+  boardId,
+  columns,
+  open,
+  onOpenChange,
+  onSuccess,
+}: TaskCreateModalProps) => {
   return (
-    <Dialog
-      onOpenChange={(nextOpen) => {
-        if (!nextOpen) {
-          router.back()
-        }
-      }}
-      open
-    >
+    <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogContent className='max-w-3xl border-border/90 bg-background p-6 sm:p-8'>
         <DialogHeader>
           <DialogTitle className='text-2xl font-semibold'>
@@ -36,10 +34,10 @@ export const TaskCreateModal = ({ boardId, columns }: TaskCreateModalProps) => {
         <TaskCreateForm
           boardId={boardId}
           columns={columns}
-          onCancel={() => router.back()}
+          onCancel={() => onOpenChange(false)}
           onSuccess={() => {
-            router.back()
-            router.refresh()
+            onSuccess?.()
+            onOpenChange(false)
           }}
         />
       </DialogContent>

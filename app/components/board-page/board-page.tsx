@@ -19,6 +19,7 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import {
   type ReactNode,
   useEffect,
@@ -27,11 +28,14 @@ import {
   useTransition,
 } from 'react'
 
+import { BoardCreateModal } from '@/components/board-create-modal/board-create-modal'
 import { BoardFilters } from '@/components/board-filters/board-filters'
 import { EmptyState } from '@/components/empty-state/empty-state'
 import { FloatingActionButton } from '@/components/floating-action-button/floating-action-button'
 import { GradientOrbs } from '@/components/gradient-orbs/gradient-orbs'
 import { TaskCard } from '@/components/task-card/task-card'
+import { TaskCreateModal } from '@/components/task-create-modal/task-create-modal'
+import { TaskDetailModal } from '@/components/task-detail-modal/task-detail-modal'
 import { Badge } from '@/components/ui/badge'
 import { moveTaskAction } from '@/lib/actions/task-actions'
 import {
@@ -59,10 +63,11 @@ type BoardPageProps = {
 type SortableTaskCardProps = {
   task: Task
   boardId: string
+  onOpen?: () => void
 }
 
 // Wrap task cards with sortable wiring while keeping a drag handle.
-const SortableTaskCard = ({ task, boardId }: SortableTaskCardProps) => {
+const SortableTaskCard = ({ task, boardId, onOpen }: SortableTaskCardProps) => {
   const {
     attributes,
     listeners,
@@ -92,6 +97,7 @@ const SortableTaskCard = ({ task, boardId }: SortableTaskCardProps) => {
         onEdit={() => console.log('Edit task:', task.id)}
         onDelete={() => console.log('Delete task:', task.id)}
         onDuplicate={() => console.log('Duplicate task:', task.id)}
+        onOpen={onOpen}
         dragProps={{
           ...attributes,
           ...listeners,
@@ -105,6 +111,7 @@ const SortableTaskCard = ({ task, boardId }: SortableTaskCardProps) => {
 type ColumnSectionProps = {
   column: Board['columns'][number]
   boardId: string
+  onOpenTask?: (task: Task) => void
 }
 
 type PlaceholderState = {
@@ -138,7 +145,8 @@ const getPlaceholderState = (
 const buildColumnItems = (
   column: Board['columns'][number],
   boardId: string,
-  placeholder: PlaceholderState
+  placeholder: PlaceholderState,
+  onOpenTask?: (task: Task) => void
 ) => {
   if (column.tasks.length === 0 && !placeholder.showPlaceholder) {
     return []
@@ -156,7 +164,14 @@ const buildColumnItems = (
     if (placeholder.showPlaceholder && index === placeholder.placeholderIndex) {
       items.push(placeholderNode)
     }
-    items.push(<SortableTaskCard key={task.id} task={task} boardId={boardId} />)
+    items.push(
+      <SortableTaskCard
+        key={task.id}
+        task={task}
+        boardId={boardId}
+        onOpen={onOpenTask ? () => onOpenTask(task) : undefined}
+      />
+    )
   }
 
   if (
@@ -175,14 +190,14 @@ const buildColumnItems = (
 }
 
 // Column wrapper keeps DnD drop state and renders task stack.
-const ColumnSection = ({ column, boardId }: ColumnSectionProps) => {
+const ColumnSection = ({ column, boardId, onOpenTask }: ColumnSectionProps) => {
   const { setNodeRef, isOver } = useDroppable({ id: toColumnId(column.id) })
   const { active, over } = useDndContext()
 
   const activeId = active ? String(active.id) : null
   const overId = over ? String(over.id) : null
   const placeholder = getPlaceholderState(column, activeId, overId)
-  const renderItems = buildColumnItems(column, boardId, placeholder)
+  const renderItems = buildColumnItems(column, boardId, placeholder, onOpenTask)
 
   return (
     <div className='flex flex-col gap-3.5'>
@@ -219,17 +234,36 @@ const ColumnSection = ({ column, boardId }: ColumnSectionProps) => {
 }
 
 export const BoardPage = ({ board }: BoardPageProps) => {
+  const router = useRouter()
   const [filters, setFilters] = useState<BoardFiltersState>(
     getDefaultBoardFilters()
   )
   const [columns, setColumns] = useState<Board['columns']>(board.columns)
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null)
+  const [isBoardCreateOpen, setIsBoardCreateOpen] = useState(false)
+  const [isTaskCreateOpen, setIsTaskCreateOpen] = useState(false)
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
   const [, startTransition] = useTransition()
 
   const totalTasks = columns.reduce(
     (total, column) => total + column.tasks.length,
     0
   )
+
+  const selectedTask = useMemo(() => {
+    if (!selectedTaskId) return null
+    return findTaskById(columns, selectedTaskId) ?? null
+  }, [columns, selectedTaskId])
+
+  const selectedTaskColumnName = useMemo(() => {
+    if (!selectedTaskId) return undefined
+    for (const column of columns) {
+      if (column.tasks.some((task) => task.id === selectedTaskId)) {
+        return column.name
+      }
+    }
+    return undefined
+  }, [columns, selectedTaskId])
 
   // Keep DnD state in sync after server refreshes (e.g., task created via modal).
   useEffect(() => {
@@ -247,6 +281,10 @@ export const BoardPage = ({ board }: BoardPageProps) => {
       activationConstraint: { distance: 8 },
     })
   )
+
+  const handleTaskOpen = (task: Task) => {
+    setSelectedTaskId(task.id)
+  }
 
   const handleDragStart = (event: DragStartEvent) => {
     const activeId = String(event.active.id)
@@ -382,6 +420,7 @@ export const BoardPage = ({ board }: BoardPageProps) => {
                 key={column.id}
                 column={column}
                 boardId={board.id}
+                onOpenTask={handleTaskOpen}
               />
             ))}
           </div>
@@ -399,7 +438,40 @@ export const BoardPage = ({ board }: BoardPageProps) => {
         </DndContext>
       </div>
 
-      <FloatingActionButton boardId={board.id} />
+      <FloatingActionButton
+        boardId={board.id}
+        onNewTask={() => setIsTaskCreateOpen(true)}
+        onNewBoard={() => setIsBoardCreateOpen(true)}
+      />
+      <BoardCreateModal
+        open={isBoardCreateOpen}
+        onOpenChange={setIsBoardCreateOpen}
+        onSuccess={(boardId) => {
+          router.push(`/boards/${boardId}`)
+          router.refresh()
+        }}
+      />
+      <TaskCreateModal
+        boardId={board.id}
+        columns={columns.map((column) => ({
+          id: column.id,
+          name: column.name,
+        }))}
+        open={isTaskCreateOpen}
+        onOpenChange={setIsTaskCreateOpen}
+        onSuccess={() => router.refresh()}
+      />
+      <TaskDetailModal
+        task={selectedTask}
+        columnName={selectedTaskColumnName}
+        boardName={board.name}
+        open={Boolean(selectedTaskId)}
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen) {
+            setSelectedTaskId(null)
+          }
+        }}
+      />
     </section>
   )
 }
