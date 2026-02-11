@@ -1,9 +1,13 @@
 'use client'
 
+import { format } from 'date-fns'
+import { CalendarDays } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { type FormEvent, useState, useTransition } from 'react'
 
 import { Button } from '@/components/ui/button'
+import { Calendar } from '@/components/ui/calendar'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { createTaskAction } from '@/lib/actions/task-actions'
 import type { TaskPriority } from '@/lib/data/task-board'
 
@@ -56,10 +60,14 @@ export const TaskCreateForm = ({
   onCancel,
   onSuccess,
 }: TaskCreateFormProps) => {
+  const currentYear = new Date().getFullYear()
+  const startMonth = new Date(currentYear - 5, 0)
+  const endMonth = new Date(currentYear + 10, 11)
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [isPending, startTransition] = useTransition()
+  const [dueDateValue, setDueDateValue] = useState('')
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -110,8 +118,8 @@ export const TaskCreateForm = ({
   }
 
   return (
-    <form onSubmit={handleSubmit} className='space-y-6'>
-      <div className='space-y-2'>
+    <form onSubmit={handleSubmit} className='space-y-5 sm:space-y-6'>
+      <div className='space-y-1.5 sm:space-y-2'>
         <label htmlFor='task-title' className='text-sm font-semibold'>
           Task title
         </label>
@@ -119,14 +127,14 @@ export const TaskCreateForm = ({
           id='task-title'
           name='title'
           placeholder='Write pricing update'
-          className='w-full rounded-2xl border border-border/80 bg-background px-4 py-3 text-sm shadow-sm outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/20'
+          className='w-full rounded-lg border border-border/80 bg-background px-3 py-2.5 text-sm outline-none transition focus:border-primary/45 focus:ring-2 focus:ring-primary/15 sm:px-3.5'
         />
         {fieldErrors.title ? (
           <p className='text-xs text-destructive'>{fieldErrors.title}</p>
         ) : null}
       </div>
-      <div className='grid gap-4 sm:grid-cols-2'>
-        <div className='space-y-2'>
+      <div className='grid gap-3 sm:grid-cols-2 sm:gap-4'>
+        <div className='space-y-1.5 sm:space-y-2'>
           <label htmlFor='task-column' className='text-sm font-semibold'>
             Column
           </label>
@@ -134,7 +142,7 @@ export const TaskCreateForm = ({
             id='task-column'
             name='columnId'
             defaultValue={columns[0]?.id}
-            className='w-full rounded-2xl border border-border/80 bg-background px-4 py-3 text-sm shadow-sm outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/20'
+            className='w-full rounded-lg border border-border/80 bg-background px-3 py-2.5 text-sm outline-none transition focus:border-primary/45 focus:ring-2 focus:ring-primary/15 sm:px-3.5'
           >
             {columns.map((column) => (
               <option key={column.id} value={column.id}>
@@ -146,7 +154,7 @@ export const TaskCreateForm = ({
             <p className='text-xs text-destructive'>{fieldErrors.columnId}</p>
           ) : null}
         </div>
-        <div className='space-y-2'>
+        <div className='space-y-1.5 sm:space-y-2'>
           <label htmlFor='task-priority' className='text-sm font-semibold'>
             Priority
           </label>
@@ -154,7 +162,7 @@ export const TaskCreateForm = ({
             id='task-priority'
             name='priority'
             defaultValue='medium'
-            className='w-full rounded-2xl border border-border/80 bg-background px-4 py-3 text-sm shadow-sm outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/20'
+            className='w-full rounded-lg border border-border/80 bg-background px-3 py-2.5 text-sm outline-none transition focus:border-primary/45 focus:ring-2 focus:ring-primary/15 sm:px-3.5'
           >
             {priorityOptions.map((priority) => (
               <option key={priority} value={priority}>
@@ -167,21 +175,48 @@ export const TaskCreateForm = ({
           ) : null}
         </div>
       </div>
-      <div className='space-y-2'>
+      <div className='space-y-1.5 sm:space-y-2'>
         <label htmlFor='task-due-date' className='text-sm font-semibold'>
           Due date
         </label>
-        <input
-          id='task-due-date'
-          name='dueDate'
-          type='date'
-          className='w-full rounded-2xl border border-border/80 bg-background px-4 py-3 text-sm shadow-sm outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/20'
-        />
+        <input id='task-due-date' name='dueDate' type='hidden' value={dueDateValue} />
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              type='button'
+              variant='outline'
+              className='h-10 w-full justify-start rounded-lg border-border/80 bg-background px-3 text-left text-sm font-normal hover:bg-accent/40'
+            >
+              <CalendarDays className='mr-2 size-4 text-primary' />
+              {dueDateValue ? (
+                format(new Date(`${dueDateValue}T00:00:00`), 'PPP')
+              ) : (
+                <span className='text-muted-foreground'>Pick a due date</span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align='start' className='w-auto p-0'>
+            <Calendar
+              mode='single'
+              captionLayout='dropdown'
+              navLayout='around'
+              startMonth={startMonth}
+              endMonth={endMonth}
+              className='rounded-lg border border-border/80 bg-card'
+              selected={
+                dueDateValue ? new Date(`${dueDateValue}T00:00:00`) : undefined
+              }
+              onSelect={(date) => {
+                setDueDateValue(date ? format(date, 'yyyy-MM-dd') : '')
+              }}
+            />
+          </PopoverContent>
+        </Popover>
         {fieldErrors.dueDate ? (
           <p className='text-xs text-destructive'>{fieldErrors.dueDate}</p>
         ) : null}
       </div>
-      <div className='space-y-2'>
+      <div className='space-y-1.5 sm:space-y-2'>
         <label htmlFor='task-description' className='text-sm font-semibold'>
           Description
         </label>
@@ -190,10 +225,10 @@ export const TaskCreateForm = ({
           name='description'
           rows={3}
           placeholder='What needs to happen for this task?'
-          className='w-full resize-none rounded-2xl border border-border/80 bg-background px-4 py-3 text-sm shadow-sm outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/20'
+          className='w-full resize-none rounded-lg border border-border/80 bg-background px-3 py-2.5 text-sm outline-none transition focus:border-primary/45 focus:ring-2 focus:ring-primary/15 sm:px-3.5'
         />
       </div>
-      <div className='space-y-2'>
+      <div className='space-y-1.5 sm:space-y-2'>
         <label htmlFor='task-labels' className='text-sm font-semibold'>
           Labels
         </label>
@@ -201,13 +236,13 @@ export const TaskCreateForm = ({
           id='task-labels'
           name='labels'
           placeholder='Design, Marketing'
-          className='w-full rounded-2xl border border-border/80 bg-background px-4 py-3 text-sm shadow-sm outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/20'
+          className='w-full rounded-lg border border-border/80 bg-background px-3 py-2.5 text-sm outline-none transition focus:border-primary/45 focus:ring-2 focus:ring-primary/15 sm:px-3.5'
         />
         {fieldErrors.labels ? (
           <p className='text-xs text-destructive'>{fieldErrors.labels}</p>
         ) : null}
       </div>
-      <div className='space-y-2'>
+      <div className='space-y-1.5 sm:space-y-2'>
         <label htmlFor='task-assignees' className='text-sm font-semibold'>
           Assignees
         </label>
@@ -215,7 +250,7 @@ export const TaskCreateForm = ({
           id='task-assignees'
           name='assignees'
           placeholder='Sam Rivera:SR, Casey Lin:CL'
-          className='w-full rounded-2xl border border-border/80 bg-background px-4 py-3 text-sm shadow-sm outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/20'
+          className='w-full rounded-lg border border-border/80 bg-background px-3 py-2.5 text-sm outline-none transition focus:border-primary/45 focus:ring-2 focus:ring-primary/15 sm:px-3.5'
         />
         <p className='text-xs text-muted-foreground'>
           Use “Name:Initials” pairs separated by commas.

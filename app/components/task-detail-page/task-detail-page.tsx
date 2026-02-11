@@ -18,8 +18,8 @@ export const TaskDetailPage = ({
   boardName,
 }: TaskDetailPageProps) => {
   return (
-    <section className='min-h-screen bg-background px-6 py-12 sm:px-10 sm:py-14'>
-      <div className='app-container flex flex-col gap-8'>
+    <section className='min-h-screen bg-background px-4 py-8 sm:px-10 sm:py-14'>
+      <div className='app-container flex flex-col gap-6 sm:gap-8'>
         <Link
           href={`/boards/${boardId}`}
           className='inline-flex items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground'

@@ -1,10 +1,16 @@
 'use client'
 
-import { CalendarDays, ClipboardList } from 'lucide-react'
+import {
+  CalendarDays,
+  ClipboardList,
+  Flag,
+  Layers3,
+  UserRound,
+} from 'lucide-react'
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import type { Task } from '@/lib/data/task-board'
+import { getPriorityVariant, type Task } from '@/lib/data/task-board'
 import { formatLongDate } from '@/lib/formatting/date'
 
 type TaskDetailProps = {
@@ -18,82 +24,112 @@ export const TaskDetail = ({
   columnName,
   boardName,
 }: TaskDetailProps) => {
+  const description =
+    task.description.trim().length > 0
+      ? task.description
+      : 'No description yet.'
+
+  const propertyRows = [
+    {
+      key: 'due',
+      icon: CalendarDays,
+      label: 'Due date',
+      value: formatLongDate(task.dueDate),
+    },
+    {
+      key: 'priority',
+      icon: Flag,
+      label: 'Priority',
+      value: task.priority,
+      className: 'capitalize',
+    },
+    {
+      key: 'column',
+      icon: ClipboardList,
+      label: 'Column',
+      value: columnName,
+    },
+    {
+      key: 'labels',
+      icon: Layers3,
+      label: 'Labels',
+      value: task.labels.length > 0 ? String(task.labels.length) : 'None',
+    },
+    {
+      key: 'assignees',
+      icon: UserRound,
+      label: 'Assignees',
+      value:
+        task.assignees.length > 0 ? `${task.assignees.length} assigned` : 'Unassigned',
+    },
+  ]
+
   return (
-    <div className='space-y-7'>
-      {/* Header */}
-      <div className='space-y-3'>
-        <Badge variant='outline' className='text-xs font-medium'>
-          {boardName} · {columnName}
-        </Badge>
-        <h2 className='text-3xl font-bold leading-tight tracking-tight'>
+    <div className='space-y-4 px-1 py-0.5 sm:space-y-5'>
+      <section className='space-y-3'>
+        <div className='flex flex-wrap items-center gap-1.5'>
+          <Badge variant='outline' className='font-meta text-[10px] uppercase'>
+            {boardName}
+          </Badge>
+          <Badge variant='outline' className='font-meta text-[10px] uppercase'>
+            {columnName}
+          </Badge>
+          <Badge
+            variant={getPriorityVariant(task.priority)}
+            className='text-[11px] capitalize'
+          >
+            {task.priority}
+          </Badge>
+        </div>
+        <h2 className='text-balance break-words text-[1.5rem] font-semibold leading-tight tracking-tight sm:text-[1.95rem]'>
           {task.title}
         </h2>
-        <p className='text-base text-muted-foreground'>{task.description}</p>
-      </div>
-
-      {/* Labels */}
-      {task.labels.length > 0 && (
-        <div className='space-y-2'>
-          <h3 className='text-sm font-semibold'>Labels</h3>
-          <div className='flex flex-wrap gap-2'>
+        <p className='max-w-4xl text-base leading-relaxed text-muted-foreground'>
+          {description}
+        </p>
+        {task.labels.length > 0 ? (
+          <div className='flex flex-wrap gap-1.5'>
             {task.labels.map((label) => (
-              <Badge key={label} variant='secondary' className='text-xs'>
+              <Badge key={label} variant='outline' className='text-xs'>
                 {label}
               </Badge>
             ))}
           </div>
-        </div>
-      )}
+        ) : null}
+      </section>
 
-      {/* Metadata */}
-      <div className='grid gap-4 sm:grid-cols-2'>
-        {/* Due date */}
-        <div className='rounded-xl border border-border/90 bg-background p-4'>
-          <div className='flex items-center gap-3'>
-            <div className='rounded-md bg-primary/10 p-2'>
-              <CalendarDays className='size-4 text-primary' />
-            </div>
-            <div>
-              <p className='text-xs font-medium text-muted-foreground'>
-                Due Date
-              </p>
-              <p className='text-sm font-semibold'>
-                {formatLongDate(task.dueDate)}
-              </p>
-            </div>
-          </div>
-        </div>
+      <section className='border-t border-border/70 pt-4'>
+        <p className='font-meta text-[11px] uppercase tracking-[0.14em] text-muted-foreground'>
+          Properties
+        </p>
+        <ul className='mt-2 divide-y divide-border/70'>
+          {propertyRows.map((row) => (
+            <li key={row.key} className='flex items-center justify-between gap-3 py-2'>
+              <span className='inline-flex items-center gap-2 text-sm text-muted-foreground'>
+                <row.icon className='size-4 text-primary' />
+                {row.label}
+              </span>
+              <span className={`text-sm font-semibold ${row.className ?? ''}`}>
+                {row.value}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
 
-        {/* Assignees count */}
-        <div className='rounded-xl border border-border/90 bg-background p-4'>
-          <div className='flex items-center gap-3'>
-            <div className='rounded-md bg-primary/10 p-2'>
-              <ClipboardList className='size-4 text-primary' />
-            </div>
-            <div>
-              <p className='text-xs font-medium text-muted-foreground'>
-                Assignees
-              </p>
-              <p className='text-sm font-semibold'>
-                {task.assignees.length} assigned
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Assignees list */}
-      {task.assignees.length > 0 && (
-        <div className='space-y-3'>
-          <h3 className='text-sm font-semibold'>Team Members</h3>
-          <div className='space-y-2'>
+      {task.assignees.length > 0 ? (
+        <section className='border-t border-border/70 pt-4'>
+          <p className='font-meta text-[11px] uppercase tracking-[0.14em] text-muted-foreground'>
+            People
+          </p>
+          <div className='mt-2 space-y-1.5'>
             {task.assignees.map((assignee) => (
               <div
                 key={assignee.id}
-                className='flex items-center gap-3 rounded-xl border border-border/90 bg-background p-3'
+                className='flex items-center gap-2.5 rounded-md border border-border/80 bg-muted/20 px-2.5 py-2'
               >
-                <Avatar className='size-9'>
-                  <AvatarFallback className='bg-primary text-primary-foreground text-xs font-semibold'>
+                <Avatar className='size-7'>
+                  <AvatarFallback className='bg-background text-xs font-semibold text-foreground'>
                     {assignee.initials}
                   </AvatarFallback>
                 </Avatar>
@@ -101,8 +137,8 @@ export const TaskDetail = ({
               </div>
             ))}
           </div>
-        </div>
-      )}
+        </section>
+      ) : null}
     </div>
   )
 }

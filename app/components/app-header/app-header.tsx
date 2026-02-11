@@ -2,7 +2,6 @@
 
 import { LayoutGrid, User } from 'lucide-react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 
 import { ThemeSwitch } from '@/components/theme-switch/theme-switch'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -16,50 +15,36 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 export const AppHeader = () => {
-  const pathname = usePathname()
-  const isHomePage = pathname === '/'
-
   return (
-    <header className='sticky top-0 z-50 border-b border-border/40 bg-background/70 backdrop-blur'>
-      <div className='app-container flex h-16 items-center justify-between'>
-        {/* Logo and Nav */}
-        <div className='flex items-center gap-8'>
-          <Link href='/' className='flex items-center gap-2 font-bold'>
-            <div className='flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground'>
-              <LayoutGrid className='size-4' />
+    <header className='sticky top-0 z-50 border-b border-border/70 bg-background/90 px-4 backdrop-blur-sm sm:px-8'>
+      <div className='app-container flex h-14 items-center justify-between sm:h-16'>
+        <div className='flex items-center gap-3'>
+          <Link
+            href='/'
+            className='flex items-center gap-3 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60'
+          >
+            <div className='flex size-8 items-center justify-center rounded-lg border border-primary/30 bg-primary/10 text-primary'>
+              <LayoutGrid className='size-3.5 sm:size-4' />
             </div>
-            <span className='text-lg'>Task Board</span>
+            <span className='text-[1.05rem] font-semibold tracking-tight sm:text-xl'>
+              Task Board
+            </span>
           </Link>
-
-          <nav className='hidden items-center gap-1 md:flex'>
-            <Link
-              href='/'
-              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
-                isHomePage
-                  ? 'bg-muted text-foreground'
-                  : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
-              }`}
-            >
-              Boards
-            </Link>
-          </nav>
         </div>
 
-        {/* Actions */}
-        <div className='flex items-center gap-2'>
+        <div className='flex items-center gap-0.5 sm:gap-1'>
           <ThemeSwitch />
 
-          {/* User Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant='ghost'
                 size='icon'
-                className='h-9 w-9 rounded-full'
+                className='h-8 w-8 rounded-full border border-transparent hover:border-border sm:h-9 sm:w-9'
               >
-                <Avatar className='size-8'>
-                  <AvatarFallback className='bg-primary/10 text-primary text-xs font-semibold'>
-                    JD
+                <Avatar className='size-7 sm:size-8'>
+                  <AvatarFallback className='bg-muted text-xs font-semibold text-foreground'>
+                    MG
                   </AvatarFallback>
                 </Avatar>
               </Button>
@@ -67,14 +52,14 @@ export const AppHeader = () => {
             <DropdownMenuContent align='end' className='w-56'>
               <div className='flex items-center gap-2 px-2 py-2'>
                 <Avatar className='size-8'>
-                  <AvatarFallback className='bg-primary/10 text-primary text-xs font-semibold'>
-                    JD
+                  <AvatarFallback className='bg-muted text-xs font-semibold text-foreground'>
+                    MG
                   </AvatarFallback>
                 </Avatar>
                 <div className='flex flex-col'>
-                  <span className='text-sm font-semibold'>John Doe</span>
+                  <span className='text-sm font-semibold'>Mateo Garcia</span>
                   <span className='text-xs text-muted-foreground'>
-                    john@example.com
+                    mateo@example.com
                   </span>
                 </div>
               </div>

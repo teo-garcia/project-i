@@ -27,19 +27,21 @@ export const TaskDetailModal = ({
 }: TaskDetailModalProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='max-w-5xl border-border/90 bg-background p-6 sm:p-8'>
-        <DialogHeader>
-          <DialogTitle className='sr-only'>Task details</DialogTitle>
+      <DialogContent className='max-h-[92vh] w-[min(860px,calc(100vw-1.5rem))] max-w-[860px] overflow-hidden border-border/90 bg-background p-0'>
+        <DialogHeader className='sr-only'>
+          <DialogTitle>Task detail</DialogTitle>
         </DialogHeader>
-        {task && columnName && boardName ? (
-          <TaskDetail
-            task={task}
-            columnName={columnName}
-            boardName={boardName}
-          />
-        ) : (
-          <TaskNotFound />
-        )}
+        <div className='overflow-y-auto px-4 pb-4 pt-12 sm:px-6 sm:pb-6 sm:pt-12'>
+          {task && columnName && boardName ? (
+            <TaskDetail
+              task={task}
+              columnName={columnName}
+              boardName={boardName}
+            />
+          ) : (
+            <TaskNotFound />
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   )

@@ -4,7 +4,7 @@ import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import type { Board } from '@/lib/data/task-board'
 
 type BoardSummaryCardProps = {
@@ -16,35 +16,44 @@ export const BoardSummaryCard = ({
   board,
   taskCount,
 }: BoardSummaryCardProps) => {
+  const description =
+    board.description.trim().length > 0
+      ? board.description
+      : 'No description yet.'
+
   return (
-    <Link href={`/boards/${board.id}`} className='group'>
-      <Card className='relative overflow-hidden border border-border/70 bg-card/90 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_18px_40px_-28px_rgba(120,72,40,0.5)]'>
-        <div className='absolute -right-12 top-4 h-24 w-24 rounded-full bg-blue-200/40 blur-2xl transition-opacity group-hover:opacity-80' />
-        <CardHeader className='space-y-3 pb-3'>
-          <div className='flex items-start justify-between'>
+    <Link
+      href={`/boards/${board.id}`}
+      className='group block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60'
+    >
+      <Card className='h-[204px] gap-0 border border-border/80 bg-card py-0 transition-[border-color,transform] duration-150 group-hover:-translate-y-px group-hover:border-primary/30 sm:h-[214px]'>
+        <CardContent className='flex h-full flex-col gap-2 p-3 sm:p-3.5'>
+          <div className='flex items-center justify-between'>
             <Badge
               variant='outline'
-              className='border-primary/30 bg-primary/10 text-xs font-medium text-primary'
+              className='font-meta rounded-md px-2 py-0 text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground'
             >
               Board
             </Badge>
-            <ArrowRight className='size-4 text-muted-foreground transition-transform group-hover:translate-x-1' />
+            <ArrowRight className='mt-0.5 size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary' />
           </div>
-          <CardTitle className='text-xl font-bold tracking-tight'>
+          <p className='line-clamp-1 text-[1.05rem] font-semibold tracking-tight sm:text-[1.1rem]'>
             {board.name}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className='space-y-4'>
-          <p className='text-sm text-muted-foreground'>{board.description}</p>
-          <div className='flex items-center gap-4 text-xs text-muted-foreground'>
+          </p>
+          <p className='min-h-[2.4rem] line-clamp-2 text-[13px] leading-relaxed text-muted-foreground sm:text-sm'>
+            {description}
+          </p>
+          <div className='mt-auto flex items-center gap-4 border-t border-border/70 pt-2 text-xs text-muted-foreground'>
             <div className='flex items-center gap-1.5'>
-              <span className='font-semibold text-foreground'>
+              <span className='font-semibold text-foreground tabular-nums'>
                 {board.columns.length}
               </span>
               <span>columns</span>
             </div>
             <div className='flex items-center gap-1.5'>
-              <span className='font-semibold text-foreground'>{taskCount}</span>
+              <span className='font-semibold text-foreground tabular-nums'>
+                {taskCount}
+              </span>
               <span>tasks</span>
             </div>
           </div>

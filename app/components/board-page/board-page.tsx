@@ -17,7 +17,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Columns3, Eye, ListTodo } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
@@ -32,11 +32,10 @@ import { BoardCreateModal } from '@/components/board-create-modal/board-create-m
 import { BoardFilters } from '@/components/board-filters/board-filters'
 import { EmptyState } from '@/components/empty-state/empty-state'
 import { FloatingActionButton } from '@/components/floating-action-button/floating-action-button'
-import { GradientOrbs } from '@/components/gradient-orbs/gradient-orbs'
 import { TaskCard } from '@/components/task-card/task-card'
 import { TaskCreateModal } from '@/components/task-create-modal/task-create-modal'
 import { TaskDetailModal } from '@/components/task-detail-modal/task-detail-modal'
-import { Badge } from '@/components/ui/badge'
+import { Card, CardContent } from '@/components/ui/card'
 import { moveTaskAction } from '@/lib/actions/task-actions'
 import {
   findTaskById,
@@ -89,7 +88,10 @@ const SortableTaskCard = ({ task, boardId, onOpen }: SortableTaskCardProps) => {
     <div
       ref={setNodeRef}
       style={style}
-      className={cn('group relative', isDragging && 'z-10 opacity-70')}
+      className={cn(
+        'group relative transition-[opacity,transform] duration-150',
+        isDragging && 'z-10 scale-[0.99] opacity-70'
+      )}
     >
       <TaskCard
         task={task}
@@ -156,7 +158,7 @@ const buildColumnItems = (
   const placeholderNode = (
     <div
       key='drop-placeholder'
-      className='h-[148px] rounded-2xl border-2 border-dashed border-primary/30 bg-primary/10'
+      className='h-[188px] rounded-xl border border-dashed border-foreground/25 bg-muted/40 sm:h-[198px]'
     />
   )
 
@@ -181,7 +183,7 @@ const buildColumnItems = (
     items.push(
       <div
         key='drop-placeholder-end'
-        className='h-[148px] rounded-2xl border-2 border-dashed border-primary/30 bg-primary/10'
+        className='h-[188px] rounded-xl border border-dashed border-foreground/25 bg-muted/40 sm:h-[198px]'
       />
     )
   }
@@ -196,14 +198,17 @@ const ColumnSection = ({ column, boardId, onOpenTask }: ColumnSectionProps) => {
 
   const activeId = active ? String(active.id) : null
   const overId = over ? String(over.id) : null
+  const isDraggingTask = activeId ? isTaskDragId(activeId) : false
   const placeholder = getPlaceholderState(column, activeId, overId)
   const renderItems = buildColumnItems(column, boardId, placeholder, onOpenTask)
 
   return (
-    <div className='flex flex-col gap-3.5'>
-      <div className='flex items-center justify-between rounded-2xl border border-border/70 bg-card/90 px-4 py-3 shadow-[0_10px_24px_-20px_rgba(120,72,40,0.35)]'>
-        <h2 className='text-sm font-semibold'>{column.name}</h2>
-        <span className='text-xs font-medium text-muted-foreground'>
+    <div className='flex flex-col gap-2.5 sm:gap-3'>
+      <div className='flex items-center justify-between rounded-xl border border-border/80 bg-card px-3.5 py-2 sm:px-4 sm:py-2.5'>
+        <h2 className='text-base font-semibold tracking-tight sm:text-[1.02rem]'>
+          {column.name}
+        </h2>
+        <span className='font-meta text-[11px] font-medium tabular-nums tracking-wide text-muted-foreground'>
           {column.tasks.length}
         </span>
       </div>
@@ -215,8 +220,10 @@ const ColumnSection = ({ column, boardId, onOpenTask }: ColumnSectionProps) => {
         <div
           ref={setNodeRef}
           className={cn(
-            'flex min-h-[120px] flex-col gap-2.5 rounded-2xl border border-transparent p-1',
-            isOver && 'border-primary/30 bg-primary/5'
+            'flex min-h-[188px] flex-col gap-3 rounded-xl border border-transparent p-0.5 transition-colors duration-150 sm:min-h-[198px] sm:p-1',
+            isDraggingTask && 'bg-muted/20',
+            isOver &&
+              'border-foreground/35 bg-muted/45 ring-1 ring-foreground/15'
           )}
         >
           {renderItems.length > 0 ? (
@@ -225,6 +232,7 @@ const ColumnSection = ({ column, boardId, onOpenTask }: ColumnSectionProps) => {
             <EmptyState
               title='No tasks'
               description={`No tasks match your filters in ${column.name}`}
+              className='h-[188px] p-6 sm:h-[198px]'
             />
           )}
         </div>
@@ -276,6 +284,14 @@ export const BoardPage = ({ board }: BoardPageProps) => {
     () => filterBoardColumns({ ...board, columns }, filters),
     [board, columns, filters]
   )
+  const visibleTaskCount = useMemo(
+    () =>
+      filteredColumns.reduce(
+        (currentTotal, column) => currentTotal + column.tasks.length,
+        0
+      ),
+    [filteredColumns]
+  )
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 8 },
@@ -285,6 +301,12 @@ export const BoardPage = ({ board }: BoardPageProps) => {
   const handleTaskOpen = (task: Task) => {
     setSelectedTaskId(task.id)
   }
+
+  const boardStats = [
+    { label: 'Columns', value: board.columns.length, icon: Columns3 },
+    { label: 'Total tasks', value: totalTasks, icon: ListTodo },
+    { label: 'Visible now', value: visibleTaskCount, icon: Eye },
+  ]
 
   const handleDragStart = (event: DragStartEvent) => {
     const activeId = String(event.active.id)
@@ -342,69 +364,45 @@ export const BoardPage = ({ board }: BoardPageProps) => {
   }
 
   return (
-    <section className='relative min-h-screen overflow-hidden bg-background px-6 pb-14 pt-12 sm:px-10 sm:pb-16 sm:pt-14'>
-      <GradientOrbs variant='board' />
-      <div className='app-container relative flex flex-col gap-12'>
-        <header className='grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] animate-in fade-in slide-in-from-bottom-6 duration-700'>
-          <div className='space-y-4'>
-            <Link
-              href='/'
-              className='inline-flex w-fit items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground'
-            >
-              <ArrowLeft className='size-4' />
-              Back to boards
-            </Link>
-            <div className='space-y-3'>
-              <div className='flex items-center gap-3'>
-                <Badge
-                  variant='outline'
-                  className='border-primary/30 bg-primary/10 text-xs font-medium text-primary'
-                >
-                  Board
-                </Badge>
-                <BoardFilters
-                  allLabels={allLabels}
-                  filters={filters}
-                  onFiltersChange={setFilters}
-                />
-              </div>
-              <h1 className='text-3xl font-bold leading-[1.05] tracking-tight sm:text-4xl lg:text-5xl'>
-                {board.name}
-              </h1>
-              <p className='max-w-2xl text-sm text-muted-foreground sm:text-base'>
-                {board.description}
-              </p>
-            </div>
+    <section className='min-h-screen bg-background px-4 pb-24 pt-8 sm:px-8 sm:pb-14 sm:pt-12'>
+      <div className='app-container flex flex-col gap-6 sm:gap-7'>
+        <header className='space-y-4 border-b border-border/70 pb-6 sm:space-y-5 sm:pb-7'>
+          <Link
+            href='/'
+            className='inline-flex w-fit items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground'
+          >
+            <ArrowLeft className='size-4' />
+            Back to boards
+          </Link>
+          <div className='space-y-2.5 sm:space-y-3'>
+            <h1 className='text-3xl font-semibold leading-[1.05] tracking-tight sm:text-[3.35rem]'>
+              {board.name} board
+            </h1>
+            <p className='max-w-3xl text-sm leading-relaxed text-muted-foreground sm:text-base'>
+              {board.description}
+            </p>
           </div>
-          <div className='rounded-[28px] border border-border/70 bg-gradient-to-br from-card/95 via-card/80 to-card/60 p-6 shadow-[0_18px_60px_-40px_rgba(120,72,40,0.5)] backdrop-blur sm:p-8'>
-            <div className='space-y-6'>
-              <div className='flex items-center justify-between text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground'>
-                <span>Board pulse</span>
-                <span className='rounded-full bg-primary/15 px-3 py-1 text-[10px] text-primary'>
-                  Active
-                </span>
-              </div>
-              <div className='grid gap-4 sm:grid-cols-2'>
-                <div className='rounded-2xl border border-border/70 bg-background/70 p-4'>
-                  <p className='text-xs text-muted-foreground'>Columns</p>
-                  <p className='text-2xl font-semibold'>
-                    {board.columns.length}
-                  </p>
-                </div>
-                <div className='rounded-2xl border border-border/70 bg-background/70 p-4'>
-                  <p className='text-xs text-muted-foreground'>Tasks</p>
-                  <p className='text-2xl font-semibold'>{totalTasks}</p>
-                </div>
-                <div className='rounded-2xl border border-border/70 bg-background/70 p-4'>
-                  <p className='text-xs text-muted-foreground'>Focus</p>
-                  <p className='text-2xl font-semibold'>High</p>
-                </div>
-                <div className='rounded-2xl border border-border/70 bg-background/70 p-4'>
-                  <p className='text-xs text-muted-foreground'>Cadence</p>
-                  <p className='text-2xl font-semibold'>Daily</p>
-                </div>
-              </div>
-            </div>
+          <div className='grid gap-2 sm:grid-cols-3 sm:gap-3'>
+            {boardStats.map((stat) => (
+              <Card
+                key={stat.label}
+                className='rounded-xl border border-primary/20 bg-primary/5 py-0 shadow-none'
+              >
+                <CardContent className='flex items-center justify-between px-3 py-2.5 sm:px-4 sm:py-3'>
+                  <div className='flex items-center gap-2'>
+                    <span className='inline-flex size-6 items-center justify-center rounded-md bg-primary/10 text-primary'>
+                      <stat.icon className='size-3.5' />
+                    </span>
+                    <span className='font-meta text-[11px] uppercase tracking-[0.14em] text-muted-foreground'>
+                      {stat.label}
+                    </span>
+                  </div>
+                  <span className='text-lg font-semibold tabular-nums text-primary'>
+                    {stat.value}
+                  </span>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </header>
 
@@ -414,15 +412,22 @@ export const BoardPage = ({ board }: BoardPageProps) => {
           onDragEnd={handleDragEnd}
           onDragCancel={handleDragCancel}
         >
-          <div className='grid gap-6 lg:grid-cols-3 animate-in fade-in slide-in-from-bottom-4 duration-700'>
-            {filteredColumns.map((column) => (
-              <ColumnSection
-                key={column.id}
-                column={column}
-                boardId={board.id}
-                onOpenTask={handleTaskOpen}
-              />
-            ))}
+          <div className='space-y-3 sm:space-y-4'>
+            <BoardFilters
+              allLabels={allLabels}
+              filters={filters}
+              onFiltersChange={setFilters}
+            />
+            <div className='grid gap-3 sm:gap-4 lg:grid-cols-3'>
+              {filteredColumns.map((column) => (
+                <ColumnSection
+                  key={column.id}
+                  column={column}
+                  boardId={board.id}
+                  onOpenTask={handleTaskOpen}
+                />
+              ))}
+            </div>
           </div>
           <DragOverlay>
             {activeTaskId ? (

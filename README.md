@@ -1,696 +1,158 @@
 # Task Board - Learning Next.js
 
-A modern task board application built to learn Next.js 15 concepts
-incrementally. This document tracks our implementation progress, learnings, and
-serves as a comprehensive guide to the project.
+A modern Kanban-style task board built as a learning project for Next.js,
+Prisma, and SQLite. The focus is to learn App Router patterns, server actions,
+and data modeling while shipping a polished UI.
 
 ---
 
-## 📋 Project Overview
+## Project Overview
 
-This is a kanban-style task board where you can organize tasks across columns,
-filter by priority and labels, and view task details in a modal overlay. Built
-with a focus on learning Next.js features step-by-step.
-
-### Tech Stack
-
-- **Next.js 16** - App Router, Server Components, Metadata API
-- **React 19** - Server Components, Client Components, hooks
-- **TypeScript** - Full type safety
-- **Tailwind CSS 4** - Utility-first styling with oklch colors
-- **shadcn/ui** - High-quality UI components built on Radix
-- **next-themes** - Theme management (light/dark/system)
-
-### Quick Start
-
-```bash
-# Install dependencies
-pnpm install
-
-# Start dev server
-pnpm dev
-
-# Open http://localhost:3000
-```
+This app lets you manage tasks across columns, filter by priority and labels,
+see details in a modal or full page, and reorder tasks with drag-and-drop.
+The UI is intentionally polished to practice real-world frontend decisions
+alongside full-stack data flow.
 
 ---
 
-## 🚀 Implementation Progress
+## Tech Stack
 
-### Roadmap
-
-1. ✅ shadcn/ui setup + base UI primitives
-2. ✅ Routes/layouts with mock data
-3. ✅ Kanban UI + task detail modal
-4. ✅ Enhanced UI + theme integration + filtering
-5. ✅ Extract business logic into lib modules
-6. ✅ Drag-and-drop and optimistic UI
-7. ✅ Prisma schema + SQLite wiring
-8. 🔄 Server Actions for CRUD
-9. ⏳ Task metadata + Zod validation
-10. ⏳ Polish + accessibility
-11. ⏳ Optional: sharing + real-time ordering
-
-**Legend:** ✅ Complete | 🔄 In Progress | ⏳ Not Started
+- Next.js 16 (App Router, Server Components, Server Actions)
+- React 19
+- TypeScript
+- Prisma + SQLite
+- Tailwind CSS 4 + shadcn/ui
 
 ---
 
-## 📚 Implementation Steps
+## Setup From Zero
 
-### Step 1 - shadcn/ui Setup ✅
+### Prereqs
 
-**Lesson:** Tailwind v4 uses a CSS entrypoint instead of a `tailwind.config.js`.
-In this repo, it lives at `app/lib/styles/globals.css` and is imported by
-`app/layout.tsx`.
+- Node.js >= 22
+- pnpm
 
-**Deliverables:**
+### Environment Setup
 
-- ✅ `components.json` configured for Next + Tailwind v4
-- ✅ `lib/utils` (for `cn`) and base styles wired
+- Copy `.env.example` to `.env`
+- The app reads `APP_PORT` and `NEXT_PUBLIC_URL` from `.env`
+- SQLite uses `DATABASE_URL` and stores data in `dev.db` at the repo root
 
-**What we learned:**
+### Database Setup
 
-- Tailwind v4 beta requires CSS-first configuration
-- shadcn/ui integrates seamlessly with modern Next.js
+- Run the Prisma migration to create tables and initialize `dev.db`
+- Run the seed step to populate sample boards, columns, tasks, and labels
+- If you reset the database, rerun the migration and seed steps
 
----
+### Running Locally
 
-### Step 2 - Core UI Primitives ✅
+- Start the dev server
+- Open the app in the browser at the local URL
+- The first load should show seeded boards if you ran the seed step
 
-**Lesson:** Building shared UI primitives early reduces rework in layout and
-interaction code.
+### Troubleshooting Setup
 
-**Deliverables:**
-
-- ✅ Card, Dialog, Badge, Avatar, DropdownMenu, Tooltip components installed
-- ✅ Theme switch uses shadcn/ui `Button`
-
-**What we learned:**
-
-- shadcn/ui components are installed individually (no bloat)
-- Each component is fully owned and customizable
-- Radix primitives provide solid accessibility foundation
-
-**Components added:**
-
-```bash
-npx shadcn@latest add card dialog badge avatar dropdown-menu tooltip button
-```
+- If the database is missing, rerun the migration
+- If the UI looks empty, confirm the seed step completed
+- If env variables are ignored, ensure `.env` is in the project root
 
 ---
 
-### Step 3 - Routes and Layouts ✅
+## Features
 
-**Lesson:** Layouts are easier to refine when the data is predictable and fake.
-Also, Next.js 15+ introduced a breaking change where `params` is now a Promise.
-
-**Deliverables:**
-
-- ✅ `/` dashboard with board listings
-- ✅ `/boards/[id]` board view with columns
-- ✅ `/boards/[id]/task/[taskId]` intercepting route for modal
-- ✅ Mock data structure in `app/lib/data/task-board.ts`
-
-**What we learned:**
-
-- **Next.js 15+ Breaking Change**: Route params are now Promises and must be
-  awaited
-- Intercepting routes with `@modal/(.)` enable modal UX
-- Parallel routes (@modal) allow soft vs hard navigation
-
-**Critical pattern - Async params:**
-
-```typescript
-// ❌ Old way (Next.js 14)
-type PageProps = {
-  params: { id: string }
-}
-
-// ✅ New way (Next.js 15+)
-type PageProps = {
-  params: Promise<{ id: string }>
-}
-
-const Page = async (props: PageProps) => {
-  const { id } = await props.params // Must await!
-  // ...
-}
-```
-
-**Intercepting routes structure:**
-
-```
-app/
-  boards/
-    [id]/
-      @modal/              # Parallel route slot
-        (.)task/           # Intercepts /boards/[id]/task/[taskId]
-          [taskId]/
-            page.tsx       # Modal view (soft navigation)
-      task/
-        [taskId]/
-          page.tsx         # Full page view (hard navigation)
-      page.tsx             # Board view
-```
-
-**Key files:**
-
-- `app/boards/[id]/page.tsx` - Board page (server component)
-- `app/boards/[id]/@modal/(.)task/[taskId]/page.tsx` - Task modal
-- `app/boards/[id]/task/[taskId]/page.tsx` - Task full page
-- `app/lib/data/task-board.ts` - Mock data and types
+- Multiple boards with unique routes
+- Kanban columns with task cards
+- Task detail view (modal + full page)
+- Priority badges and due-date status
+- Filters for priority, labels, and empty columns
+- Drag-and-drop with optimistic UI
+- Light/dark/system theme toggle
+- Context menu UI for task actions
 
 ---
 
-### Step 4 - Kanban UI + Task Modal ✅
+## Roadmap / Implementation Plan
 
-**Lesson:** Establish visual hierarchy before adding drag-and-drop. Also learned
-the importance of splitting Server and Client components strategically.
+### 1) Base UI primitives (shadcn/ui)
 
-**Deliverables:**
+- Install foundational UI components (cards, dialogs, badges, menus, tooltips)
+- Establish theme tokens and component styling conventions
 
-- ✅ Columns layout with task cards
-- ✅ Task detail modal with metadata
-- ✅ Professional design with Supabase-style emerald colors
-- ✅ Responsive layout with gradients
+### 2) App Router routes + layouts
 
-**What we learned:**
+- Build the home dashboard with board listings
+- Add board detail routes and task detail routes
+- Establish server vs client component boundaries
 
-- **Server/Client split pattern**: `page.tsx` (server) → `*-content.tsx`
-  (client)
-- oklch color space for better color interpolation in dark mode
-- Gradient overlays create visual depth
-- Use Server Components for data fetching, Client Components for interactivity
+### 3) Kanban UI + task detail modal
 
-**Color system (oklch):**
+- Build columns and task cards
+- Add a detailed task view in a modal and as a full page
+- Ensure tasks can be opened from the board view
 
-```css
-/* Emerald green primary (Supabase-style) */
---primary: oklch(0.55 0.17 165);
---primary-foreground: oklch(0.99 0 0);
-```
+### 4) Filters + theme integration
 
-**Key files:**
+- Add filters for priority, labels, and empty columns
+- Integrate theme switcher with persisted preferences
+- Improve visual hierarchy and density for scanning tasks
 
-- `app/boards/[id]/board-content.tsx` - Client component with state
-- `app/components/task-card/task-card.tsx` - Task card component
-- `app/components/task-detail/task-detail.tsx` - Task detail content
-- `app/lib/styles/globals.css` - Theme colors
+### 5) Business logic in lib modules
 
----
+- Move filtering, formatting, and DnD logic into shared modules
+- Centralize domain types and helper utilities
 
-### Step 4.5 - Enhanced UI & Features ✅
+### 6) Drag-and-drop + optimistic UI
 
-**Lessons learned:**
+- Enable drag-and-drop within and across columns
+- Update the UI optimistically while persisting changes
 
-1. **Theme integration** - Fixed positioning conflicts with app structure
-2. **Filtering patterns** - Client-side filtering with `useMemo` for performance
-3. **Badge variants** - Visual hierarchy with shadcn/ui badge system
-4. **Tooltip UX** - Improves information density without clutter
-5. **Memoization** - Prevent unnecessary re-renders with expensive computations
+### 7) Prisma schema + SQLite wiring
 
-**Enhancements delivered:**
+- Model boards, columns, tasks, labels, and assignees
+- Implement Prisma client setup and local SQLite database
+- Add seed data for realistic boards
 
-- ✅ App header with navigation and theme switcher
-- ✅ Floating action button for quick task creation
-- ✅ Task priority system (urgent, high, medium, low)
-- ✅ Status indicators (overdue, due soon)
-- ✅ Board filtering by priority, labels, and empty columns
-- ✅ Avatar tooltips showing assignee names
-- ✅ Empty states for better UX
-- ✅ Context menu actions (edit, delete, duplicate)
+### 8) Server Actions for CRUD
 
-**Filtering implementation:**
+- Create board and task actions for create, update, delete
+- Add action-based persistence for drag-and-drop ordering
+- Revalidate routes after mutations
 
-```typescript
-// Client component with filtering state
-const [filters, setFilters] = useState<BoardFilters>({
-  priorities: [],
-  labels: [],
-  showEmpty: true,
-})
+### 9) Zod validation for inputs
 
-// Memoized filtering for performance
-const filteredColumns = useMemo(() => {
-  return board.columns
-    .map((column) => {
-      const filteredTasks = column.tasks.filter((task) => {
-        if (
-          filters.priorities.length > 0 &&
-          !filters.priorities.includes(task.priority)
-        ) {
-          return false
-        }
-        if (filters.labels.length > 0) {
-          const hasMatchingLabel = task.labels.some((label) =>
-            filters.labels.includes(label)
-          )
-          if (!hasMatchingLabel) return false
-        }
-        return true
-      })
-      return { ...column, tasks: filteredTasks }
-    })
-    .filter((column) => filters.showEmpty || column.tasks.length > 0)
-}, [board, filters])
-```
+- Validate board/task inputs in server actions
+- Return field-level error messages to the UI
 
-**Helper functions added:**
+### 10) Wire update/delete flows in the UI
 
-```typescript
-// app/lib/data/task-board.ts
+- Connect edit/delete UI to server actions
+- Add confirmation patterns for destructive actions
 
-// Badge variant based on priority
-getPriorityVariant(priority: TaskPriority): BadgeVariant
-// urgent → destructive (red)
-// high → default (green)
-// medium → secondary (gray)
-// low → outline (border only)
+### 11) Polish + accessibility
 
-// Date-based status checks
-isTaskOverdue(dueDate: string): boolean
-isTaskDueSoon(dueDate: string): boolean  // Within 3 days
+- Improve keyboard navigation and focus states
+- Audit contrast and ARIA usage
 
-// Data access
-getBoardById(id: string): Board | undefined
-getTaskById(boardId: string, taskId: string): {...} | null
-countBoardTasks(board: Board): number
-```
+### 12) Optional: sharing + real-time ordering
 
-**Key files:**
-
-- `app/components/app-header/app-header.tsx` - Global navigation
-- `app/components/board-filters/board-filters.tsx` - Filter component
-- `app/components/floating-action-button/floating-action-button.tsx` - FAB
-- `app/components/theme-switch/theme-switch.tsx` - Theme toggle (moved to
-  header)
-- `app/components/ui/tooltip.tsx` - Tooltip primitive
+- Consider multi-user viewing
+- Add real-time ordering updates
 
 ---
 
-### Step 5 - Drag-and-Drop Interactions ✅
+## Current Status (as of Feb 2, 2026)
 
-**Lesson:** Keep DnD logic client-only and isolate state updates for snappy UX.
-
-**Deliverables:**
-
-- ✅ Task reordering within columns
-- ✅ Moving tasks between columns
-- ✅ Optimistic UI updates
-- ✅ Visual feedback during drag operations
-
-**Key files:**
-
-- `app/components/board-page/board-page.tsx`
-- `app/components/task-card/task-card.tsx`
-- `app/lib/board/dnd.ts`
+- CRUD server actions exist for boards and tasks
+- Create flows are wired in the UI (modals + pages)
+- Update/delete actions are not wired in the UI yet
 
 ---
 
-### Step 6 - Prisma + SQLite Setup ✅
+## Development Commands (names only)
 
-**Lesson:** Prisma v7 uses driver adapters for SQLite and a generated client
-output folder that you import from.
+- dev server
+- database migration
+- database seed
+- lint and typecheck
+- unit tests
 
-**Deliverables:**
-
-- ✅ Prisma init with SQLite datasource
-- ✅ Schema for boards, columns, tasks, labels, assignees
-- ✅ SQLite migrations and local `dev.db`
-- ✅ Seed script with `tsx` and Prisma Client adapter
-
-**What we learned:**
-
-- `prisma migrate dev` is interactive and creates the SQLite file
-- `prisma db seed` runs only when explicitly invoked in Prisma v7
-- SQLite does not support `skipDuplicates` in `createMany`
-- `connect({ name })` requires `name` to be unique in the schema
-
-**Key files:**
-
-- `prisma/schema.prisma`
-- `prisma/seed.ts`
-- `prisma.config.ts`
-- `lib/prisma.ts`
-
----
-
-### Step 7 - Server Actions for CRUD 🔄
-
-**Lesson:** Keep reads in server-only modules and use server actions to persist
-changes while the client stays optimistic.
-
-**In progress:**
-
-- ✅ Server-only data access via Prisma
-- ✅ Task move persistence with server actions + revalidation
-- 🔄 CRUD server actions for boards and tasks
-- 🔄 Create flows via intercepting routes
-
-**Key files:**
-
-- `app/lib/db/boards.ts`
-- `app/lib/actions/board-actions.ts`
-- `app/lib/actions/task-actions.ts`
-- `app/boards/new/page.tsx`
-- `app/boards/[id]/task/new/page.tsx`
-- `app/@modal/(.)boards/new/page.tsx`
-- `app/boards/[id]/@modal/(.)task/new/page.tsx`
-
----
-
-## 🎓 Key Next.js Concepts Learned
-
-### 1. App Router Architecture
-
-- File-based routing with `app/` directory
-- Route groups for organization without URL segments: `(group)/`
-- Nested layouts for shared UI across routes
-- Parallel routes with `@slot` syntax
-
-### 2. Server vs Client Components
-
-**Server Components (default):**
-
-- Fetch data directly from backend
-- Access environment variables securely
-- Reduce client-side JavaScript bundle
-- Cannot use hooks, event handlers, or browser APIs
-
-**Client Components (`'use client'`):**
-
-- Interactive state with hooks (`useState`, `useEffect`)
-- Event handlers (`onClick`, `onChange`)
-- Browser APIs (`localStorage`, `window`)
-- Third-party libraries that use hooks
-
-**Strategic pattern:**
-
-```typescript
-// app/boards/[id]/page.tsx (Server Component)
-const BoardPage = async (props: PageProps) => {
-  const { id } = await props.params
-  const board = getBoardById(id)  // Data fetching
-  return <BoardContent board={board} />  // Pass to client
-}
-
-// app/boards/[id]/board-content.tsx (Client Component)
-'use client'
-export const BoardContent = ({ board }: Props) => {
-  const [filters, setFilters] = useState(...)  // Client state
-  // Interactive UI
-}
-```
-
-### 3. Dynamic Routes with Promises (Next.js 15+)
-
-**Breaking change in Next.js 15:**
-
-```typescript
-// Route params are now Promises
-type PageProps = {
-  params: Promise<{ id: string }>
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
-}
-
-const Page = async (props: PageProps) => {
-  const { id } = await props.params
-  const searchParams = await props.searchParams
-  // ...
-}
-```
-
-### 4. Intercepting Routes for Modals
-
-Creates smooth modal UX while maintaining shareable URLs:
-
-```
-@modal/(.)task/[taskId]  → Modal overlay when navigating from board
-task/[taskId]            → Full page when accessing URL directly
-```
-
-**How it works:**
-
-- Click task card → Soft navigation → Shows modal
-- Copy/paste URL → Hard navigation → Shows full page
-- Both share the same URL structure
-
-### 5. Metadata API
-
-**Dynamic metadata:**
-
-```typescript
-export const generateMetadata = async (props: PageProps): Promise<Metadata> => {
-  const { id } = await props.params
-  const board = getBoardById(id)
-
-  return {
-    title: `${board.name} | Task Board`,
-    description: board.description,
-  }
-}
-```
-
-**Benefits:**
-
-- SEO-friendly without manual head management
-- Type-safe metadata generation
-- Automatic deduplication
-
-### 6. Component Patterns
-
-**Server → Client data flow:**
-
-- Fetch data in Server Component
-- Pass as props to Client Component
-- Client handles interactivity
-
-**Memoization for performance:**
-
-```typescript
-const filteredData = useMemo(() => {
-  return expensiveOperation(data, filters)
-}, [data, filters]) // Only recompute when dependencies change
-```
-
-### 7. Styling Best Practices
-
-**Tailwind CSS 4:**
-
-- CSS-first configuration in `globals.css`
-- No `tailwind.config.js` needed
-- oklch color space for better gradients
-
-**Component variants with cn():**
-
-```typescript
-import { cn } from '@/lib/utils'
-
-<div className={cn(
-  'base-classes',
-  variant === 'primary' && 'primary-classes',
-  variant === 'secondary' && 'secondary-classes'
-)} />
-```
-
-### 8. shadcn/ui Integration
-
-**Philosophy:**
-
-- Install components individually (no package dependency)
-- Own the code (components live in your repo)
-- Built on Radix UI primitives (accessibility included)
-- Fully customizable
-
-**Usage:**
-
-```bash
-# Add specific components
-npx shadcn@latest add card badge avatar
-
-# Components appear in app/components/ui/
-# You own and can modify them
-```
-
----
-
-## 📁 Project Structure
-
-```
-app/
-├── boards/
-│   └── [id]/                       # Dynamic board route
-│       ├── @modal/                 # Parallel route slot for modals
-│       │   └── (.)task/            # Intercepts /boards/[id]/task/[taskId]
-│       │       └── [taskId]/
-│       │           └── page.tsx    # Modal view (soft navigation)
-│       ├── task/
-│       │   └── [taskId]/
-│       │       └── page.tsx        # Full page view (hard navigation)
-│       ├── board-content.tsx       # Client component with filtering state
-│       └── page.tsx                # Server component (data fetching)
-├── components/
-│   ├── ui/                         # shadcn/ui components
-│   │   ├── card.tsx
-│   │   ├── badge.tsx
-│   │   ├── avatar.tsx
-│   │   ├── tooltip.tsx
-│   │   └── ...
-│   ├── app-header/                 # Global navigation header
-│   ├── board-filters/              # Filter dropdown component
-│   ├── task-card/                  # Task card with badges & tooltips
-│   ├── task-detail/                # Task detail content
-│   ├── theme-switch/               # Theme toggle button
-│   ├── floating-action-button/     # FAB for quick actions
-│   ├── empty-state/                # Empty state component
-│   └── global-providers/           # Theme & other providers
-├── lib/
-│   ├── data/
-│   │   └── task-board.ts           # Mock data, types, helpers
-│   ├── styles/
-│   │   └── globals.css             # Tailwind v4 entrypoint + theme
-│   └── utils.ts                    # cn() utility
-├── layout.tsx                      # Root layout with providers
-└── page.tsx                        # Homepage with board listings
-```
-
----
-
-## 🛠️ Development Commands
-
-| Command              | Description                             |
-| -------------------- | --------------------------------------- |
-| `pnpm dev`           | Start development server with Turbopack |
-| `pnpm build`         | Create production build                 |
-| `pnpm start`         | Run production server                   |
-| `pnpm test`          | Run unit tests                          |
-| `pnpm test:browser`  | Run browser tests                       |
-| `pnpm lint:es`       | Lint and fix with ESLint                |
-| `pnpm lint:es:check` | Check ESLint without fixing             |
-| `pnpm lint:ts`       | TypeScript type checking                |
-| `pnpm format`        | Format with Prettier                    |
-| `pnpm format:check`  | Check formatting                        |
-
----
-
-## ✨ Current Features
-
-- ✅ Multiple boards with unique routes
-- ✅ Task columns (Backlog, In Progress, Done)
-- ✅ Task cards with priority indicators
-- ✅ Priority badges (urgent=red, high=green, medium=gray, low=outline)
-- ✅ Status badges (Overdue, Due Soon)
-- ✅ Filter by priority and labels
-- ✅ Toggle empty columns visibility
-- ✅ Task detail modal (intercepting route)
-- ✅ Theme switcher (light/dark/system) in header
-- ✅ Responsive design with gradients
-- ✅ Avatar tooltips showing assignee names
-- ✅ App header with navigation
-- ✅ Floating action button
-- ✅ Empty states for better UX
-- ✅ Context menu actions (edit, delete, duplicate)
-
----
-
-## 💡 Key Learnings Summary
-
-1. **Server Components are the default** - Use client components sparingly for
-   interactivity only
-2. **Route organization matters** - Intercepting routes enable smooth modal UX
-   with shareable URLs
-3. **Params are Promises in Next.js 15+** - Always await them in dynamic routes
-4. **Split server/client strategically** - Fetch data on server, handle state on
-   client
-5. **Tailwind v4 uses CSS entrypoint** - No more `tailwind.config.js`, configure
-   in CSS
-6. **shadcn/ui is component-first** - Install only what you need, own the code
-7. **Type safety everywhere** - TypeScript + strict mode catches errors early
-8. **Metadata API is powerful** - SEO without manual head tags
-9. **Memoization prevents waste** - Use `useMemo` for expensive
-   filtering/computation
-10. **oklch colors interpolate better** - Especially for dark mode transitions
-11. **Prisma v7 + SQLite** - Use driver adapters and import the generated client
-    from `generated/prisma`
-12. **Server actions** - Use `revalidatePath` after mutations to refresh server
-    data
-
----
-
-## 🐛 Troubleshooting
-
-### 404 on Dynamic Routes
-
-**Problem:** Getting 404 errors on `/boards/[id]` routes
-
-**Solution:**
-
-- Ensure params are awaited: `const { id } = await props.params`
-- Check route structure matches Next.js App Router conventions
-- Verify dynamic segment folder is named with brackets: `[id]`
-
-### Theme Not Persisting
-
-**Problem:** Theme resets on page reload
-
-**Solution:**
-
-- Verify `next-themes` ThemeProvider wraps your app in root layout
-- Check localStorage is enabled in browser
-- Ensure `suppressHydrationWarning` on `<html>` tag
-
-### Components Not Updating
-
-**Problem:** Changes not reflecting in UI
-
-**Solution:**
-
-- Verify `'use client'` directive at top of file for stateful components
-- Check if state is lifted to appropriate component level
-- Ensure dependencies array in `useMemo`/`useEffect` is correct
-
-### Type Errors with Params
-
-**Problem:** TypeScript errors: "params is not a Promise"
-
-**Solution:**
-
-- Update type definition: `params: Promise<{ id: string }>`
-- Await params: `const { id } = await props.params`
-- This is a Next.js 15+ breaking change
-
----
-
-## 📚 Resources
-
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Next.js App Router Guide](https://nextjs.org/docs/app)
-- [shadcn/ui Documentation](https://ui.shadcn.com)
-- [Tailwind CSS v4 Beta](https://tailwindcss.com/docs/v4-beta)
-- [Radix UI Primitives](https://www.radix-ui.com/primitives)
-- [React 19 Documentation](https://react.dev)
-
----
-
-## 🎯 What's Next
-
-**Immediate next step:** Step 7 - Server Actions for CRUD
-
-We'll implement:
-
-- Task create/update/delete via server actions
-- Board create/update/delete via server actions
-- Revalidation patterns to keep UI fresh
-
-This will teach us about:
-
-- Server Actions API and execution model
-- Server-only data modules
-- Keeping optimistic UI in sync with the database
-
----
-
-**Last updated:** After starting Step 7 (Server Actions for CRUD)
-
-Built while learning Next.js incrementally. This document is continuously
-updated with each implementation step.

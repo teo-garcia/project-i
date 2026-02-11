@@ -1,7 +1,7 @@
 import '@/lib/styles/globals.css'
 
 import type { Metadata } from 'next'
-import { Bricolage_Grotesque, Instrument_Sans } from 'next/font/google'
+import { IBM_Plex_Mono, IBM_Plex_Sans } from 'next/font/google'
 
 import { AppShell } from './components/app-shell/app-shell'
 import { GlobalProviders } from './components/global-providers/global-providers'
@@ -13,30 +13,26 @@ export const metadata: Metadata = {
   },
 }
 
-const bricolageGrotesque = Bricolage_Grotesque({
+const ibmPlexMono = IBM_Plex_Mono({
   subsets: ['latin'],
   variable: '--font-heading',
   display: 'swap',
-  weight: ['600', '700'],
+  weight: ['500', '600'],
 })
 
-const instrumentSans = Instrument_Sans({
+const ibmPlexSans = IBM_Plex_Sans({
   subsets: ['latin'],
   variable: '--font-body',
   display: 'swap',
   weight: ['400', '500', '600', '700'],
 })
 
-type RootLayoutProps = {
-  children: React.ReactNode
-}
-
-const RootLayout = async ({ children }: RootLayoutProps) => {
+const RootLayout = async ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang='en' suppressHydrationWarning>
       <head />
       <body
-        className={`${bricolageGrotesque.variable} ${instrumentSans.variable} font-body antialiased`}
+        className={`${ibmPlexMono.variable} ${ibmPlexSans.variable} font-body antialiased`}
       >
         <GlobalProviders>
           <AppShell>{children}</AppShell>

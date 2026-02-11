@@ -50,7 +50,7 @@ export const ThemeSwitch = () => {
       variant='ghost'
       size='icon'
       aria-label={`Theme switcher, current mode: ${activeTheme}`}
-      className='h-9 w-9'
+      className='h-9 w-9 rounded-full border border-transparent hover:border-border'
       title={`Current theme: ${activeTheme}. Click to switch to ${getNextTheme()}`}
     >
       {getCurrentIcon()}

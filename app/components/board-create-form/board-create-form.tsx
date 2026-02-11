@@ -62,8 +62,8 @@ export const BoardCreateForm = ({
   }
 
   return (
-    <form onSubmit={handleSubmit} className='space-y-6'>
-      <div className='space-y-2'>
+    <form onSubmit={handleSubmit} className='space-y-5 sm:space-y-6'>
+      <div className='space-y-1.5 sm:space-y-2'>
         <label htmlFor='board-name' className='text-sm font-semibold'>
           Board name
         </label>
@@ -71,13 +71,13 @@ export const BoardCreateForm = ({
           id='board-name'
           name='name'
           placeholder='Launch HQ'
-          className='w-full rounded-2xl border border-border/80 bg-background px-4 py-3 text-sm shadow-sm outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/20'
+          className='w-full rounded-lg border border-border/80 bg-background px-3 py-2.5 text-sm outline-none transition focus:border-primary/45 focus:ring-2 focus:ring-primary/15 sm:px-3.5'
         />
         {fieldErrors.name ? (
           <p className='text-xs text-destructive'>{fieldErrors.name}</p>
         ) : null}
       </div>
-      <div className='space-y-2'>
+      <div className='space-y-1.5 sm:space-y-2'>
         <label htmlFor='board-description' className='text-sm font-semibold'>
           Description
         </label>
@@ -86,10 +86,10 @@ export const BoardCreateForm = ({
           name='description'
           rows={3}
           placeholder='What is this board focused on?'
-          className='w-full resize-none rounded-2xl border border-border/80 bg-background px-4 py-3 text-sm shadow-sm outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/20'
+          className='w-full resize-none rounded-lg border border-border/80 bg-background px-3 py-2.5 text-sm outline-none transition focus:border-primary/45 focus:ring-2 focus:ring-primary/15 sm:px-3.5'
         />
       </div>
-      <div className='space-y-2'>
+      <div className='space-y-1.5 sm:space-y-2'>
         <label htmlFor='board-columns' className='text-sm font-semibold'>
           Columns
         </label>
@@ -97,7 +97,7 @@ export const BoardCreateForm = ({
           id='board-columns'
           name='columns'
           placeholder='Backlog, In Progress, Done'
-          className='w-full rounded-2xl border border-border/80 bg-background px-4 py-3 text-sm shadow-sm outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/20'
+          className='w-full rounded-lg border border-border/80 bg-background px-3 py-2.5 text-sm outline-none transition focus:border-primary/45 focus:ring-2 focus:ring-primary/15 sm:px-3.5'
         />
         <p className='text-xs text-muted-foreground'>
           Leave blank to use the default workflow.

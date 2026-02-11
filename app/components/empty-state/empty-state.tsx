@@ -1,6 +1,7 @@
-import { Inbox,Plus } from 'lucide-react'
+import { Inbox, Plus } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 type EmptyStateProps = {
   title: string
@@ -8,6 +9,7 @@ type EmptyStateProps = {
   actionLabel?: string
   onAction?: () => void
   icon?: React.ReactNode
+  className?: string
 }
 
 export const EmptyState = ({
@@ -16,16 +18,24 @@ export const EmptyState = ({
   actionLabel,
   onAction,
   icon,
+  className,
 }: EmptyStateProps) => {
   return (
-    <div className='flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border/60 bg-muted/20 p-12 text-center'>
-      <div className='mb-4 rounded-full bg-muted p-4 text-muted-foreground'>
-        {icon || <Inbox className='size-8' />}
+    <div
+      className={cn(
+        'flex flex-col items-center justify-center rounded-xl border border-dashed border-border/70 bg-muted/15 p-10 text-center',
+        className
+      )}
+    >
+      <div className='mb-3 rounded-full bg-muted p-3 text-muted-foreground'>
+        {icon || <Inbox className='size-6' />}
       </div>
-      <h3 className='mb-2 text-lg font-semibold'>{title}</h3>
-      <p className='mb-6 max-w-sm text-sm text-muted-foreground'>{description}</p>
+      <h3 className='mb-1.5 text-base font-semibold tracking-tight'>{title}</h3>
+      <p className='mb-5 max-w-sm text-sm leading-relaxed text-muted-foreground'>
+        {description}
+      </p>
       {actionLabel && onAction && (
-        <Button onClick={onAction} className='gap-2'>
+        <Button onClick={onAction} size='sm' className='gap-2'>
           <Plus className='size-4' />
           {actionLabel}
         </Button>

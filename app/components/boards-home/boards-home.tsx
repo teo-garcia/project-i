@@ -1,14 +1,14 @@
 'use client'
 
-import { LayoutGrid, Plus } from 'lucide-react'
+import { Columns3, LayoutGrid, ListTodo, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { BoardCreateModal } from '@/components/board-create-modal/board-create-modal'
 import { BoardSummaryCard } from '@/components/board-summary-card/board-summary-card'
-import { GradientOrbs } from '@/components/gradient-orbs/gradient-orbs'
-import { Badge } from '@/components/ui/badge'
+import { FloatingActionButton } from '@/components/floating-action-button/floating-action-button'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import type { Board } from '@/lib/data/task-board'
 import { countBoardTasks } from '@/lib/data/task-board'
 
@@ -27,86 +27,64 @@ export const BoardsHome = ({ boards }: BoardsHomeProps) => {
     (total, board) => total + board.columns.length,
     0
   )
+  const stats = [
+    { label: 'Boards', value: boards.length, icon: LayoutGrid },
+    { label: 'Tasks', value: taskCount, icon: ListTodo },
+    { label: 'Columns', value: columnCount, icon: Columns3 },
+  ]
 
   return (
-    <section className='relative min-h-screen overflow-hidden bg-background px-6 pb-14 pt-12 sm:px-10 sm:pb-16 sm:pt-14'>
-      <GradientOrbs variant='home' />
-      <div className='app-container relative flex flex-col gap-12'>
-        <header className='grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] animate-in fade-in slide-in-from-bottom-6 duration-700'>
-          <div className='space-y-6'>
-            <div className='flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground'>
-              <LayoutGrid className='size-4' />
-              <span>Your Boards</span>
-            </div>
-            <div className='space-y-3'>
-              <h1 className='text-balance text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl'>
-                Task Board for teams that ship with clarity.
-              </h1>
-              <p className='max-w-2xl text-base text-muted-foreground sm:text-lg'>
-                Build momentum with kanban boards that feel alive. Snap tasks
-                into motion, spotlight priorities, and keep every project
-                crystal clear.
-              </p>
-            </div>
-            <div className='flex flex-wrap items-center gap-4'>
-              <Badge className='rounded-full border-0 bg-primary px-4 py-1.5 text-sm text-primary-foreground shadow-md shadow-primary/20'>
-                Live teamwork
-              </Badge>
-              <Badge className='rounded-full border border-border/70 bg-card/70 px-4 py-1.5 text-sm text-foreground'>
-                Clear priorities
-              </Badge>
-              <Badge className='rounded-full border border-border/70 bg-card/70 px-4 py-1.5 text-sm text-foreground'>
-                Instant momentum
-              </Badge>
-              <Button
-                size='sm'
-                className='rounded-full border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20'
-                onClick={() => setIsCreateOpen(true)}
-              >
-                <span className='flex items-center gap-2'>
-                  <Plus className='size-4' />
-                  New board
-                </span>
-              </Button>
-            </div>
+    <section className='min-h-screen bg-background px-4 pb-10 pt-6 sm:px-8 sm:pb-14 sm:pt-12'>
+      <div className='app-container flex flex-col gap-5 sm:gap-8'>
+        <header className='space-y-4 border-b border-border/70 pb-5 sm:space-y-5 sm:pb-7'>
+          <div className='flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground'>
+            <LayoutGrid className='size-4' />
+            <span>Your Boards</span>
           </div>
-          <div className='rounded-[28px] border border-border/70 bg-gradient-to-br from-card/95 via-card/80 to-card/60 p-6 shadow-[0_18px_60px_-40px_rgba(120,72,40,0.5)] backdrop-blur sm:p-8'>
-            <div className='space-y-6'>
-              <div className='flex items-center justify-between text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground'>
-                <span>At a glance</span>
-                <span className='rounded-full bg-primary/15 px-3 py-1 text-[10px] text-primary'>
-                  Today
-                </span>
-              </div>
-              <div className='space-y-2'>
-                <p className='text-2xl font-semibold'>Focus flow unlocked.</p>
-                <p className='text-sm text-muted-foreground'>
-                  Every board comes with a tuned cadence for fast-moving teams.
-                </p>
-              </div>
-              <div className='grid gap-4 sm:grid-cols-2'>
-                <div className='rounded-2xl border border-border/70 bg-background/70 p-4'>
-                  <p className='text-xs text-muted-foreground'>Active boards</p>
-                  <p className='text-2xl font-semibold'>{boards.length}</p>
-                </div>
-                <div className='rounded-2xl border border-border/70 bg-background/70 p-4'>
-                  <p className='text-xs text-muted-foreground'>Total tasks</p>
-                  <p className='text-2xl font-semibold'>{taskCount}</p>
-                </div>
-                <div className='rounded-2xl border border-border/70 bg-background/70 p-4'>
-                  <p className='text-xs text-muted-foreground'>Columns</p>
-                  <p className='text-2xl font-semibold'>{columnCount}</p>
-                </div>
-                <div className='rounded-2xl border border-border/70 bg-background/70 p-4'>
-                  <p className='text-xs text-muted-foreground'>Team rhythm</p>
-                  <p className='text-2xl font-semibold'>Steady</p>
-                </div>
-              </div>
-            </div>
+          <div className='space-y-2.5 sm:space-y-3'>
+            <h1 className='max-w-4xl text-balance text-3xl font-semibold leading-[1.05] tracking-tight sm:text-5xl'>
+              Structured boards for focused execution.
+            </h1>
+            <p className='max-w-3xl text-[13px] leading-relaxed text-muted-foreground sm:text-base'>
+              Consistent lanes, cleaner cards, and task signals you can scan in
+              seconds.
+            </p>
+          </div>
+          <div className='flex flex-wrap items-center gap-2.5'>
+            <Button
+              size='sm'
+              className='h-8 gap-2 px-3 sm:h-9 sm:px-3.5'
+              onClick={() => setIsCreateOpen(true)}
+            >
+              <Plus className='size-4' />
+              New board
+            </Button>
+          </div>
+          <div className='grid gap-2 sm:grid-cols-3 sm:gap-3'>
+            {stats.map((stat) => (
+              <Card
+                key={stat.label}
+                className='rounded-xl border border-primary/20 bg-primary/5 py-0 shadow-none'
+              >
+                <CardContent className='flex items-center justify-between px-3 py-2.5 sm:px-4 sm:py-3'>
+                  <div className='flex items-center gap-2'>
+                    <span className='inline-flex size-6 items-center justify-center rounded-md bg-primary/10 text-primary'>
+                      <stat.icon className='size-3.5' />
+                    </span>
+                    <span className='font-meta text-[11px] uppercase tracking-[0.14em] text-muted-foreground'>
+                      {stat.label}
+                    </span>
+                  </div>
+                  <span className='text-lg font-semibold tabular-nums text-primary'>
+                    {stat.value}
+                  </span>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </header>
 
-        <div className='grid gap-6 sm:grid-cols-2 animate-in fade-in slide-in-from-bottom-4 duration-700'>
+        <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
           {boards.map((board) => (
             <BoardSummaryCard
               key={board.id}
@@ -125,6 +103,7 @@ export const BoardsHome = ({ boards }: BoardsHomeProps) => {
           router.refresh()
         }}
       />
+      <FloatingActionButton onNewBoard={() => setIsCreateOpen(true)} />
     </section>
   )
 }

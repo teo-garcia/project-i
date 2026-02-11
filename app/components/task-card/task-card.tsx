@@ -1,12 +1,13 @@
 'use client'
 
 import {
-  CircleDot,
+  CalendarClock,
   Copy,
   GripVertical,
   MoreVertical,
   Pencil,
   Trash2,
+  UserRound,
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -65,98 +66,103 @@ export const TaskCard = ({
 }: TaskCardProps) => {
   const overdue = isTaskOverdue(task.dueDate)
   const dueSoon = isTaskDueSoon(task.dueDate)
+  const description =
+    task.description.trim().length > 0 ? task.description : 'No description yet.'
 
   const card = (
     <Card
-      className={`relative overflow-hidden border bg-card/90 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_16px_34px_-24px_rgba(120,72,40,0.45)] ${
-        overdue ? 'border-destructive/50' : 'border-border/60'
-      }`}
+      className='relative flex h-[188px] flex-col gap-0 overflow-hidden rounded-xl border border-border/80 bg-card py-0 shadow-[0_1px_0_rgba(15,23,42,0.03)] transition-[border-color,box-shadow] duration-200 before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-primary/20 hover:border-primary/35 hover:shadow-[0_8px_20px_rgba(15,23,42,0.06)] sm:h-[198px]'
     >
-      <div className='absolute -right-10 top-3 h-20 w-20 rounded-full bg-blue-200/40 blur-2xl transition-opacity group-hover:opacity-80' />
-
-      <div className='absolute left-3 top-3 inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground/70'>
-        <GripVertical className='size-3.5 opacity-70' />
-        Drag
-      </div>
-
-      {/* Actions Menu - appears on hover */}
-      <div className='absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100'>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant='ghost'
-              size='icon'
-              className='size-7 rounded-md bg-background/90 backdrop-blur-sm hover:bg-background'
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-              }}
+      <CardContent className='flex flex-1 flex-col p-2.5 sm:p-3'>
+        <div className='mb-2 flex items-center justify-between gap-2'>
+          <div className='inline-flex items-center gap-1.5'>
+            <Badge
+              variant='outline'
+              className='font-meta rounded-md px-2 py-0 text-[10px] uppercase tracking-[0.12em] text-muted-foreground'
             >
-              <MoreVertical className='size-3.5' />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align='end'
-            sideOffset={8}
-            collisionPadding={12}
-            className='w-40 rounded-xl border border-border/80 bg-popover p-1.5 shadow-lg backdrop-blur'
-          >
-            <DropdownMenuItem onClick={(e) => handleCardAction(e, onEdit)}>
-              <Pencil className='mr-2 size-3.5' />
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={(e) => handleCardAction(e, onDuplicate)}>
-              <Copy className='mr-2 size-3.5' />
-              Duplicate
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className='text-destructive focus:text-destructive'
-              onClick={(e) => handleCardAction(e, onDelete)}
+              Task
+            </Badge>
+            <span
+              aria-hidden
+              className='inline-flex size-5 items-center justify-center rounded-md text-muted-foreground/70'
             >
-              <Trash2 className='mr-2 size-3.5' />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-
-      <CardContent className='p-4'>
-        <div className='flex items-start justify-between gap-3'>
-          <div className='flex-1 space-y-1.5'>
-            <p className='text-sm font-semibold leading-tight'>{task.title}</p>
-            <p className='text-xs text-muted-foreground line-clamp-2'>
-              {task.description}
-            </p>
+              <GripVertical className='size-3.5 opacity-70' />
+            </span>
           </div>
-          <CircleDot className='mt-0.5 size-3.5 shrink-0 text-muted-foreground/40' />
+          <div className='opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100'>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant='ghost'
+                  size='icon'
+                  className='size-6 rounded-md text-muted-foreground/85 hover:text-foreground sm:size-7'
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                  }}
+                >
+                  <MoreVertical className='size-3.5' />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align='end'
+                sideOffset={8}
+                collisionPadding={12}
+                className='w-40 rounded-xl border border-border bg-popover p-1.5 shadow-md'
+              >
+                <DropdownMenuItem onClick={(e) => handleCardAction(e, onEdit)}>
+                  <Pencil className='mr-2 size-3.5' />
+                  Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={(e) => handleCardAction(e, onDuplicate)}
+                >
+                  <Copy className='mr-2 size-3.5' />
+                  Duplicate
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className='text-destructive focus:text-destructive'
+                  onClick={(e) => handleCardAction(e, onDelete)}
+                >
+                  <Trash2 className='mr-2 size-3.5' />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
 
-        {/* Labels and Priority */}
-        <div className='mt-3 flex flex-wrap items-center gap-1.5'>
-          {/* Priority Badge */}
+        <div className='space-y-1.5'>
+          <p className='pr-6 text-base font-semibold leading-snug tracking-tight sm:text-lg'>
+            {task.title}
+          </p>
+          <p className='min-h-[2.5rem] line-clamp-2 text-[13px] leading-relaxed text-muted-foreground sm:text-sm'>
+            {description}
+          </p>
+        </div>
+
+        <div className='mt-1.5 flex flex-wrap items-center gap-1.5 sm:mt-2'>
           <Badge
             variant={getPriorityVariant(task.priority)}
-            className='text-xs px-2 py-0 capitalize'
+            className='px-2 py-0 text-xs capitalize'
           >
             {task.priority}
           </Badge>
 
-          {/* Status Badges */}
           {overdue && (
-            <Badge variant='destructive' className='text-xs px-2 py-0'>
+            <Badge variant='destructive' className='px-2 py-0 text-xs'>
               Overdue
             </Badge>
           )}
           {!overdue && dueSoon && (
-            <Badge className='bg-accent text-accent-foreground text-xs px-2 py-0'>
+            <Badge variant='secondary' className='px-2 py-0 text-xs'>
               Due Soon
             </Badge>
           )}
 
-          {/* Labels */}
           {task.labels.slice(0, 1).map((label) => (
-            <Badge key={label} variant='outline' className='text-xs px-2 py-0'>
+            <Badge key={label} variant='outline' className='px-2 py-0 text-xs'>
               {label}
             </Badge>
           ))}
@@ -168,48 +174,55 @@ export const TaskCard = ({
         </div>
       </CardContent>
 
-      {/* Card Footer with assignees and due date */}
-      <CardFooter className='border-t border-border/50 bg-muted/30 p-3'>
-        <div className='flex w-full items-center justify-between'>
-          {/* Assignees */}
-          <div className='flex -space-x-2'>
-            {task.assignees.slice(0, 3).map((assignee) => (
-              <Tooltip key={assignee.id}>
-                <TooltipTrigger asChild>
-                  <Avatar className='size-6 border-2 border-card cursor-pointer'>
-                    <AvatarFallback className='bg-primary text-primary-foreground text-[10px] font-semibold'>
-                      {assignee.initials}
-                    </AvatarFallback>
-                  </Avatar>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{assignee.name}</p>
-                </TooltipContent>
-              </Tooltip>
-            ))}
-            {task.assignees.length > 3 && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className='flex size-6 items-center justify-center rounded-full border-2 border-card bg-muted text-[10px] font-semibold text-muted-foreground cursor-pointer'>
-                    +{task.assignees.length - 3}
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>
-                    {task.assignees
-                      .slice(3)
-                      .map((a) => a.name)
-                      .join(', ')}
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            )}
-          </div>
+      <CardFooter className='mt-auto border-t border-border/70 bg-muted/10 p-1.5 sm:p-2'>
+        <div className='flex w-full items-center justify-between gap-2'>
+          {task.assignees.length > 0 ? (
+            <div className='flex -space-x-2'>
+              {task.assignees.slice(0, 3).map((assignee) => (
+                <Tooltip key={assignee.id}>
+                  <TooltipTrigger asChild>
+                    <Avatar className='size-5 border-2 border-card sm:size-6'>
+                      <AvatarFallback className='bg-muted text-[10px] font-semibold text-foreground'>
+                        {assignee.initials}
+                      </AvatarFallback>
+                    </Avatar>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{assignee.name}</p>
+                  </TooltipContent>
+                </Tooltip>
+              ))}
+              {task.assignees.length > 3 && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className='flex size-5 items-center justify-center rounded-full border-2 border-card bg-muted text-[10px] font-semibold text-muted-foreground sm:size-6'>
+                      +{task.assignees.length - 3}
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>
+                      {task.assignees
+                        .slice(3)
+                        .map((a) => a.name)
+                        .join(', ')}
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              )}
+            </div>
+          ) : (
+            <span className='inline-flex items-center gap-1 rounded-md border border-border/90 bg-background px-2 py-0.5 text-[11px] text-muted-foreground'>
+              <UserRound className='size-3' />
+              Unassigned
+            </span>
+          )}
 
-          {/* Due Date */}
-          <span className='text-xs text-muted-foreground'>
-            {formatShortDate(task.dueDate)}
-          </span>
+          <div className='inline-flex items-center gap-1 text-muted-foreground'>
+            <CalendarClock className='size-3.5' />
+            <span className='font-meta text-[11px] tabular-nums uppercase tracking-[0.08em]'>
+              {formatShortDate(task.dueDate)}
+            </span>
+          </div>
         </div>
       </CardFooter>
     </Card>
@@ -221,13 +234,20 @@ export const TaskCard = ({
     content = card
   } else if (onOpen) {
     content = (
-      <button type='button' onClick={onOpen} className='block w-full text-left'>
+      <button
+        type='button'
+        onClick={onOpen}
+        className='block w-full rounded-xl text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60'
+      >
         {card}
       </button>
     )
   } else {
     content = (
-      <Link href={`/boards/${boardId}/task/${task.id}`} className='block'>
+      <Link
+        href={`/boards/${boardId}/task/${task.id}`}
+        className='block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60'
+      >
         {card}
       </Link>
     )
