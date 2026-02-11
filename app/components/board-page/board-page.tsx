@@ -331,31 +331,31 @@ export const BoardPage = ({ board }: BoardPageProps) => {
       return
     }
 
-    setColumns((current) => {
-      const target = getDropTarget(current, overId)
-      const targetColumn = target.columnId
-        ? current.find((column) => column.id === target.columnId)
-        : null
+    const target = getDropTarget(columns, overId)
+    const targetColumn = target.columnId
+      ? columns.find((column) => column.id === target.columnId)
+      : null
 
-      if (!targetColumn) {
-        return current
-      }
+    if (!targetColumn) {
+      setActiveTaskId(null)
+      return
+    }
 
-      const targetIndex = target.taskId
-        ? targetColumn.tasks.findIndex((task) => task.id === target.taskId)
-        : targetColumn.tasks.length
+    const targetIndex = target.taskId
+      ? targetColumn.tasks.findIndex((task) => task.id === target.taskId)
+      : targetColumn.tasks.length
 
-      startTransition(() => {
-        void moveTaskAction({
-          boardId: board.id,
-          taskId: fromTaskId(activeId),
-          toColumnId: targetColumn.id,
-          toIndex: targetIndex === -1 ? targetColumn.tasks.length : targetIndex,
-        })
+    setColumns((current) => moveTask(current, activeId, overId))
+
+    startTransition(() => {
+      void moveTaskAction({
+        boardId: board.id,
+        taskId: fromTaskId(activeId),
+        toColumnId: targetColumn.id,
+        toIndex: targetIndex === -1 ? targetColumn.tasks.length : targetIndex,
       })
-
-      return moveTask(current, activeId, overId)
     })
+
     setActiveTaskId(null)
   }
 
