@@ -1,158 +1,182 @@
-# Task Board - Learning Next.js
+# Task Board
 
-A modern Kanban-style task board built as a learning project for Next.js,
-Prisma, and SQLite. The focus is to learn App Router patterns, server actions,
-and data modeling while shipping a polished UI.
+<p align="center">
+  Kanban-style task management built with Next.js App Router, Prisma, and SQLite.
+</p>
 
----
+<p align="center">
+  <img alt="Next.js" src="https://img.shields.io/badge/Next.js-16-black" />
+  <img alt="React" src="https://img.shields.io/badge/React-19-149ECA" />
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5-3178C6" />
+  <img alt="Prisma" src="https://img.shields.io/badge/Prisma-ORM-2D3748" />
+  <img alt="SQLite" src="https://img.shields.io/badge/SQLite-Local%20DB-003B57" />
+  <img alt="Tailwind CSS" src="https://img.shields.io/badge/Tailwind-4-06B6D4" />
+</p>
 
-## Project Overview
+A modern, production-style learning project focused on:
 
-This app lets you manage tasks across columns, filter by priority and labels,
-see details in a modal or full page, and reorder tasks with drag-and-drop.
-The UI is intentionally polished to practice real-world frontend decisions
-alongside full-stack data flow.
+- App Router architecture
+- Server Actions + validation
+- Optimistic drag-and-drop updates
+- Polished UI patterns for real workflows
 
----
+## Demo
 
-## Tech Stack
+### Main Workflow (GIF placeholder)
 
-- Next.js 16 (App Router, Server Components, Server Actions)
-- React 19
-- TypeScript
-- Prisma + SQLite
-- Tailwind CSS 4 + shadcn/ui
+![Main Workflow Placeholder](docs/media/demo-main-workflow.gif)
 
----
+### Screenshots (image placeholders)
 
-## Setup From Zero
-
-### Prereqs
-
-- Node.js >= 22
-- pnpm
-
-### Environment Setup
-
-- Copy `.env.example` to `.env`
-- The app reads `APP_PORT` and `NEXT_PUBLIC_URL` from `.env`
-- SQLite uses `DATABASE_URL` and stores data in `dev.db` at the repo root
-
-### Database Setup
-
-- Run the Prisma migration to create tables and initialize `dev.db`
-- Run the seed step to populate sample boards, columns, tasks, and labels
-- If you reset the database, rerun the migration and seed steps
-
-### Running Locally
-
-- Start the dev server
-- Open the app in the browser at the local URL
-- The first load should show seeded boards if you ran the seed step
-
-### Troubleshooting Setup
-
-- If the database is missing, rerun the migration
-- If the UI looks empty, confirm the seed step completed
-- If env variables are ignored, ensure `.env` is in the project root
-
----
+![Boards Home Placeholder](docs/media/screenshot-boards-home.png)
+![Board Detail Placeholder](docs/media/screenshot-board-detail.png)
+![Task Modal Placeholder](docs/media/screenshot-task-modal.png)
+![Task Full Page Placeholder](docs/media/screenshot-task-page.png)
 
 ## Features
 
-- Multiple boards with unique routes
-- Kanban columns with task cards
-- Task detail view (modal + full page)
-- Priority badges and due-date status
+- Multi-board workspace with dedicated board routes
+- Kanban columns and sortable task cards
+- Drag-and-drop across columns with optimistic UI
+- Task detail in modal and full page route
+- Task actions: create, edit, duplicate, delete
+- Board actions: create, edit, delete
 - Filters for priority, labels, and empty columns
-- Drag-and-drop with optimistic UI
-- Light/dark/system theme toggle
-- Context menu UI for task actions
+- Priority and due-date status indicators
+- Theme switching (light/dark/system)
+- Prisma-backed persistence with SQLite
 
----
+## Tech Stack
 
-## Roadmap / Implementation Plan
+| Layer      | Technology                                                 |
+| ---------- | ---------------------------------------------------------- |
+| Framework  | Next.js 16 (App Router, Server Components, Server Actions) |
+| UI         | React 19, Tailwind CSS 4, shadcn/ui, Radix UI              |
+| Data       | Prisma ORM, SQLite                                         |
+| Language   | TypeScript                                                 |
+| Validation | Zod                                                        |
+| DnD        | dnd-kit                                                    |
+| Tooling    | ESLint, Prettier, Vitest                                   |
 
-### 1) Base UI primitives (shadcn/ui)
+## Quick Start
 
-- Install foundational UI components (cards, dialogs, badges, menus, tooltips)
-- Establish theme tokens and component styling conventions
+### Prerequisites
 
-### 2) App Router routes + layouts
+- Node.js `>= 22`
+- `pnpm`
 
-- Build the home dashboard with board listings
-- Add board detail routes and task detail routes
-- Establish server vs client component boundaries
+### 1. Install
 
-### 3) Kanban UI + task detail modal
+```bash
+pnpm install
+```
 
-- Build columns and task cards
-- Add a detailed task view in a modal and as a full page
-- Ensure tasks can be opened from the board view
+### 2. Configure environment
 
-### 4) Filters + theme integration
+```bash
+cp .env.example .env
+```
 
-- Add filters for priority, labels, and empty columns
-- Integrate theme switcher with persisted preferences
-- Improve visual hierarchy and density for scanning tasks
+### 3. Initialize database
 
-### 5) Business logic in lib modules
+```bash
+pnpm db:migrate
+pnpm db:seed
+```
 
-- Move filtering, formatting, and DnD logic into shared modules
-- Centralize domain types and helper utilities
+### 4. Run locally
 
-### 6) Drag-and-drop + optimistic UI
+```bash
+pnpm dev
+```
 
-- Enable drag-and-drop within and across columns
-- Update the UI optimistically while persisting changes
+Open your local app URL (from `.env`) in the browser.
 
-### 7) Prisma schema + SQLite wiring
+## Environment Variables
 
-- Model boards, columns, tasks, labels, and assignees
-- Implement Prisma client setup and local SQLite database
-- Add seed data for realistic boards
+| Variable          | Description              |
+| ----------------- | ------------------------ |
+| `APP_PORT`        | Local app port           |
+| `NEXT_PUBLIC_URL` | Public app base URL      |
+| `DATABASE_URL`    | SQLite connection string |
 
-### 8) Server Actions for CRUD
+## Scripts
 
-- Create board and task actions for create, update, delete
-- Add action-based persistence for drag-and-drop ordering
-- Revalidate routes after mutations
+| Command              | Purpose               |
+| -------------------- | --------------------- |
+| `pnpm dev`           | Start dev server      |
+| `pnpm build`         | Production build      |
+| `pnpm start`         | Run production server |
+| `pnpm db:migrate`    | Run Prisma migrations |
+| `pnpm db:seed`       | Seed sample data      |
+| `pnpm lint:es:check` | ESLint checks         |
+| `pnpm lint:ts`       | TypeScript check      |
+| `pnpm test -- --run` | Run tests             |
 
-### 9) Zod validation for inputs
+## Implementation Plan And Progress
 
-- Validate board/task inputs in server actions
-- Return field-level error messages to the UI
+Status date: **February 17, 2026**
 
-### 10) Wire update/delete flows in the UI
+### Completed
 
-- Connect edit/delete UI to server actions
-- Add confirmation patterns for destructive actions
+- [x] 1. Base UI primitives (shadcn/ui)
+- [x] 2. App Router routes + layouts
+- [x] 3. Kanban UI + task detail modal
+- [x] 4. Filters + theme integration
+- [x] 5. Business logic in `app/lib`
+- [x] 6. Drag-and-drop + optimistic UI
+- [x] 7. Prisma schema + SQLite wiring
+- [x] 8. Server Actions for CRUD
+- [x] 9. Zod validation for inputs
+- [x] 10. Wire update/delete flows in UI
 
-### 11) Polish + accessibility
+### Recent Delivered Changes
 
-- Improve keyboard navigation and focus states
-- Audit contrast and ARIA usage
+- [x] Task and board update/delete flows wired from UI to server actions
+- [x] Update/delete input validation added with field-level error returns
+- [x] Drag-and-drop resequencing fixed to use transaction client consistently
 
-### 12) Optional: sharing + real-time ordering
+### In Progress / Next
 
-- Consider multi-user viewing
-- Add real-time ordering updates
+- [ ] 11. Polish + accessibility
+- [ ] Add toast feedback for create/update/delete success and failure states
+- [ ] Replace `alert`/`confirm` destructive flows with accessible dialogs +
+      toast confirmations
+- [ ] Improve keyboard navigation and focus states
+- [ ] Contrast and ARIA audit
+- [ ] 6b) Harden optimistic DnD reliability
+- [ ] Add rollback behavior when DnD persistence fails
+- [ ] Show user-facing toast errors when task move persistence fails
 
----
+### Optional Future
 
-## Current Status (as of Feb 2, 2026)
+- [ ] 12. Sharing + real-time ordering
+- [ ] Multi-user board viewing
+- [ ] Real-time ordering updates
 
-- CRUD server actions exist for boards and tasks
-- Create flows are wired in the UI (modals + pages)
-- Update/delete actions are not wired in the UI yet
+### Deferred Quality Track
 
----
+- [ ] Fix Vitest 4 browser provider config migration (`browser.provider`
+      factory)
+- [ ] Add unit tests for server actions and board/task interaction helpers
+- [ ] Add interaction tests for toast flows (success/error) across CRUD actions
+- [ ] Add interaction tests for optimistic DnD rollback and failure feedback
 
-## Development Commands (names only)
+## Project Structure
 
-- dev server
-- database migration
-- database seed
-- lint and typecheck
-- unit tests
+```text
+app/
+  boards/
+  components/
+  lib/
+prisma/
+  schema.prisma
+  seed.ts
+```
 
+## Notes
+
+- This repo is intentionally built as a practical learning project with
+  production-style patterns.
+- Replace all files in `docs/media/*` placeholders with your own screenshots and
+  GIFs.

@@ -4,8 +4,15 @@ import { revalidatePath } from 'next/cache'
 
 import type { TaskPriority } from '@/lib/data/task-board'
 import { prisma } from '@/lib/prisma'
-import { taskCreateSchema, taskMoveSchema } from '@/lib/validation/schemas'
+import {
+  taskCreateSchema,
+  taskDeleteSchema,
+  taskMoveSchema,
+  taskUpdateSchema,
+} from '@/lib/validation/schemas'
 import { formatZodErrors } from '@/lib/validation/utils'
+
+import type { Prisma } from '../../../generated/prisma/client'
 
 type MoveTaskInput = {
   boardId: string
@@ -18,7 +25,7 @@ const resequenceColumn = async (
   taskIds: string[],
   columnId: string,
   updateColumn: boolean,
-  tx: typeof prisma
+  tx: Prisma.TransactionClient
 ) => {
   await Promise.all(
     taskIds.map((taskId, order) =>
@@ -85,12 +92,12 @@ export const moveTaskAction = async ({
     targetIds.splice(clampedIndex, 0, taskId)
 
     if (sourceColumnId === toColumnId) {
-      await resequenceColumn(targetIds, toColumnId, false, prisma)
+      await resequenceColumn(targetIds, toColumnId, false, tx)
       return
     }
 
-    await resequenceColumn(sourceIds, sourceColumnId, false, prisma)
-    await resequenceColumn(targetIds, toColumnId, true, prisma)
+    await resequenceColumn(sourceIds, sourceColumnId, false, tx)
+    await resequenceColumn(targetIds, toColumnId, true, tx)
   })
 
   revalidatePath(`/boards/${boardId}`)
@@ -198,20 +205,37 @@ export const updateTaskAction = async ({
   labels,
   assignees,
 }: UpdateTaskInput) => {
+  const parsed = taskUpdateSchema.safeParse({
+    boardId,
+    taskId,
+    title,
+    description,
+    dueDate,
+    priority,
+    labels,
+    assignees,
+  })
+
+  if (!parsed.success) {
+    return { ok: false, errors: formatZodErrors(parsed.error) } as const
+  }
+
   await prisma.$transaction(async (tx) => {
     await tx.task.update({
-      where: { id: taskId },
+      where: { id: parsed.data.taskId },
       data: {
-        title,
-        description,
-        dueDate: dueDate ? new Date(dueDate) : undefined,
-        priority,
+        title: parsed.data.title,
+        description: parsed.data.description,
+        dueDate: parsed.data.dueDate
+          ? new Date(parsed.data.dueDate)
+          : undefined,
+        priority: parsed.data.priority,
       },
     })
 
-    if (labels) {
-      await tx.taskLabel.deleteMany({ where: { taskId } })
-      for (const label of labels) {
+    if (parsed.data.labels) {
+      await tx.taskLabel.deleteMany({ where: { taskId: parsed.data.taskId } })
+      for (const label of parsed.data.labels) {
         const record = await tx.label.upsert({
           where: { name: label },
           update: {},
@@ -219,16 +243,18 @@ export const updateTaskAction = async ({
         })
         await tx.taskLabel.create({
           data: {
-            taskId,
+            taskId: parsed.data.taskId,
             labelId: record.id,
           },
         })
       }
     }
 
-    if (assignees) {
-      await tx.taskAssignee.deleteMany({ where: { taskId } })
-      for (const assignee of assignees) {
+    if (parsed.data.assignees) {
+      await tx.taskAssignee.deleteMany({
+        where: { taskId: parsed.data.taskId },
+      })
+      for (const assignee of parsed.data.assignees) {
         const record = await tx.assignee.upsert({
           where: { name: assignee.name },
           update: { initials: assignee.initials },
@@ -239,7 +265,7 @@ export const updateTaskAction = async ({
         })
         await tx.taskAssignee.create({
           data: {
-            taskId,
+            taskId: parsed.data.taskId,
             assigneeId: record.id,
           },
         })
@@ -247,8 +273,10 @@ export const updateTaskAction = async ({
     }
   })
 
-  revalidatePath(`/boards/${boardId}`)
-  revalidatePath(`/boards/${boardId}/task/${taskId}`)
+  revalidatePath(`/boards/${parsed.data.boardId}`)
+  revalidatePath(`/boards/${parsed.data.boardId}/task/${parsed.data.taskId}`)
+
+  return { ok: true } as const
 }
 
 type DeleteTaskInput = {
@@ -260,6 +288,14 @@ export const deleteTaskAction = async ({
   boardId,
   taskId,
 }: DeleteTaskInput) => {
-  await prisma.task.delete({ where: { id: taskId } })
-  revalidatePath(`/boards/${boardId}`)
+  const parsed = taskDeleteSchema.safeParse({ boardId, taskId })
+
+  if (!parsed.success) {
+    return { ok: false, errors: formatZodErrors(parsed.error) } as const
+  }
+
+  await prisma.task.delete({ where: { id: parsed.data.taskId } })
+  revalidatePath(`/boards/${parsed.data.boardId}`)
+
+  return { ok: true } as const
 }

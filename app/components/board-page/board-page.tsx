@@ -17,7 +17,14 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { ArrowLeft, Columns3, Eye, ListTodo } from 'lucide-react'
+import {
+  ArrowLeft,
+  Columns3,
+  Eye,
+  ListTodo,
+  MoreVertical,
+  Trash2,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
@@ -29,14 +36,29 @@ import {
 } from 'react'
 
 import { BoardCreateModal } from '@/components/board-create-modal/board-create-modal'
+import { BoardEditModal } from '@/components/board-edit-modal/board-edit-modal'
 import { BoardFilters } from '@/components/board-filters/board-filters'
 import { EmptyState } from '@/components/empty-state/empty-state'
 import { FloatingActionButton } from '@/components/floating-action-button/floating-action-button'
 import { TaskCard } from '@/components/task-card/task-card'
 import { TaskCreateModal } from '@/components/task-create-modal/task-create-modal'
 import { TaskDetailModal } from '@/components/task-detail-modal/task-detail-modal'
+import { TaskEditModal } from '@/components/task-edit-modal/task-edit-modal'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { moveTaskAction } from '@/lib/actions/task-actions'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { deleteBoardAction } from '@/lib/actions/board-actions'
+import {
+  createTaskAction,
+  deleteTaskAction,
+  moveTaskAction,
+} from '@/lib/actions/task-actions'
 import {
   findTaskById,
   fromTaskId,
@@ -63,10 +85,20 @@ type SortableTaskCardProps = {
   task: Task
   boardId: string
   onOpen?: () => void
+  onEditTask?: (task: Task) => void
+  onDeleteTask?: (task: Task) => void
+  onDuplicateTask?: (task: Task) => void
 }
 
 // Wrap task cards with sortable wiring while keeping a drag handle.
-const SortableTaskCard = ({ task, boardId, onOpen }: SortableTaskCardProps) => {
+const SortableTaskCard = ({
+  task,
+  boardId,
+  onOpen,
+  onEditTask,
+  onDeleteTask,
+  onDuplicateTask,
+}: SortableTaskCardProps) => {
   const {
     attributes,
     listeners,
@@ -96,9 +128,9 @@ const SortableTaskCard = ({ task, boardId, onOpen }: SortableTaskCardProps) => {
       <TaskCard
         task={task}
         boardId={boardId}
-        onEdit={() => console.log('Edit task:', task.id)}
-        onDelete={() => console.log('Delete task:', task.id)}
-        onDuplicate={() => console.log('Duplicate task:', task.id)}
+        onEdit={onEditTask ? () => onEditTask(task) : undefined}
+        onDelete={onDeleteTask ? () => onDeleteTask(task) : undefined}
+        onDuplicate={onDuplicateTask ? () => onDuplicateTask(task) : undefined}
         onOpen={onOpen}
         dragProps={{
           ...attributes,
@@ -114,6 +146,9 @@ type ColumnSectionProps = {
   column: Board['columns'][number]
   boardId: string
   onOpenTask?: (task: Task) => void
+  onEditTask?: (task: Task) => void
+  onDeleteTask?: (task: Task) => void
+  onDuplicateTask?: (task: Task) => void
 }
 
 type PlaceholderState = {
@@ -148,7 +183,10 @@ const buildColumnItems = (
   column: Board['columns'][number],
   boardId: string,
   placeholder: PlaceholderState,
-  onOpenTask?: (task: Task) => void
+  onOpenTask?: (task: Task) => void,
+  onEditTask?: (task: Task) => void,
+  onDeleteTask?: (task: Task) => void,
+  onDuplicateTask?: (task: Task) => void
 ) => {
   if (column.tasks.length === 0 && !placeholder.showPlaceholder) {
     return []
@@ -172,6 +210,9 @@ const buildColumnItems = (
         task={task}
         boardId={boardId}
         onOpen={onOpenTask ? () => onOpenTask(task) : undefined}
+        onEditTask={onEditTask}
+        onDeleteTask={onDeleteTask}
+        onDuplicateTask={onDuplicateTask}
       />
     )
   }
@@ -191,8 +232,24 @@ const buildColumnItems = (
   return items
 }
 
+const removeTaskFromColumns = (
+  boardColumns: Board['columns'],
+  taskId: string
+): Board['columns'] =>
+  boardColumns.map((column) => ({
+    ...column,
+    tasks: column.tasks.filter((task) => task.id !== taskId),
+  }))
+
 // Column wrapper keeps DnD drop state and renders task stack.
-const ColumnSection = ({ column, boardId, onOpenTask }: ColumnSectionProps) => {
+const ColumnSection = ({
+  column,
+  boardId,
+  onOpenTask,
+  onEditTask,
+  onDeleteTask,
+  onDuplicateTask,
+}: ColumnSectionProps) => {
   const { setNodeRef, isOver } = useDroppable({ id: toColumnId(column.id) })
   const { active, over } = useDndContext()
 
@@ -200,7 +257,15 @@ const ColumnSection = ({ column, boardId, onOpenTask }: ColumnSectionProps) => {
   const overId = over ? String(over.id) : null
   const isDraggingTask = activeId ? isTaskDragId(activeId) : false
   const placeholder = getPlaceholderState(column, activeId, overId)
-  const renderItems = buildColumnItems(column, boardId, placeholder, onOpenTask)
+  const renderItems = buildColumnItems(
+    column,
+    boardId,
+    placeholder,
+    onOpenTask,
+    onEditTask,
+    onDeleteTask,
+    onDuplicateTask
+  )
 
   return (
     <div className='flex flex-col gap-2.5 sm:gap-3'>
@@ -249,9 +314,13 @@ export const BoardPage = ({ board }: BoardPageProps) => {
   const [columns, setColumns] = useState<Board['columns']>(board.columns)
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null)
   const [isBoardCreateOpen, setIsBoardCreateOpen] = useState(false)
+  const [isBoardEditOpen, setIsBoardEditOpen] = useState(false)
   const [isTaskCreateOpen, setIsTaskCreateOpen] = useState(false)
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null)
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
-  const [, startTransition] = useTransition()
+  const [, startMoveTransition] = useTransition()
+  const [, startTaskMutationTransition] = useTransition()
+  const [, startBoardMutationTransition] = useTransition()
 
   const totalTasks = columns.reduce(
     (total, column) => total + column.tasks.length,
@@ -262,6 +331,11 @@ export const BoardPage = ({ board }: BoardPageProps) => {
     if (!selectedTaskId) return null
     return findTaskById(columns, selectedTaskId) ?? null
   }, [columns, selectedTaskId])
+
+  const editingTask = useMemo(() => {
+    if (!editingTaskId) return null
+    return findTaskById(columns, editingTaskId) ?? null
+  }, [columns, editingTaskId])
 
   const selectedTaskColumnName = useMemo(() => {
     if (!selectedTaskId) return undefined
@@ -300,6 +374,106 @@ export const BoardPage = ({ board }: BoardPageProps) => {
 
   const handleTaskOpen = (task: Task) => {
     setSelectedTaskId(task.id)
+  }
+
+  const getTaskColumn = (taskId: string) =>
+    columns.find((column) => column.tasks.some((task) => task.id === taskId))
+
+  const handleTaskEdit = (task: Task) => {
+    setEditingTaskId(task.id)
+  }
+
+  const runTaskDelete = async (task: Task) => {
+    const result = await deleteTaskAction({
+      boardId: board.id,
+      taskId: task.id,
+    })
+
+    if (!result.ok) {
+      globalThis.alert(result.errors.form ?? 'Unable to delete task.')
+      return
+    }
+
+    setColumns((current) => removeTaskFromColumns(current, task.id))
+    setSelectedTaskId((current) => (current === task.id ? null : current))
+    setEditingTaskId((current) => (current === task.id ? null : current))
+    router.refresh()
+  }
+
+  const handleTaskDelete = (task: Task) => {
+    const shouldDelete = globalThis.confirm(
+      `Delete "${task.title}"? This action cannot be undone.`
+    )
+
+    if (!shouldDelete) {
+      return
+    }
+
+    startTaskMutationTransition(() => {
+      void runTaskDelete(task)
+    })
+  }
+
+  const runTaskDuplicate = async (task: Task, sourceColumnId: string) => {
+    const result = await createTaskAction({
+      boardId: board.id,
+      columnId: sourceColumnId,
+      title: `${task.title} (Copy)`,
+      description: task.description,
+      dueDate: task.dueDate,
+      priority: task.priority,
+      labels: task.labels,
+      assignees: task.assignees.map((assignee) => ({
+        name: assignee.name,
+        initials: assignee.initials,
+      })),
+    })
+
+    if (!result.ok) {
+      globalThis.alert(result.errors.form ?? 'Unable to duplicate task.')
+      return
+    }
+
+    router.refresh()
+  }
+
+  const handleTaskDuplicate = (task: Task) => {
+    const sourceColumn = getTaskColumn(task.id)
+
+    if (!sourceColumn) {
+      globalThis.alert('Unable to find source column for duplication.')
+      return
+    }
+
+    startTaskMutationTransition(() => {
+      void runTaskDuplicate(task, sourceColumn.id)
+    })
+  }
+
+  const runBoardDelete = async () => {
+    const result = await deleteBoardAction({ boardId: board.id })
+
+    if (!result.ok) {
+      globalThis.alert(result.errors.form ?? 'Unable to delete board.')
+      return
+    }
+
+    router.push('/')
+    router.refresh()
+  }
+
+  const handleBoardDelete = () => {
+    const shouldDelete = globalThis.confirm(
+      `Delete board "${board.name}" and all of its tasks?`
+    )
+
+    if (!shouldDelete) {
+      return
+    }
+
+    startBoardMutationTransition(() => {
+      void runBoardDelete()
+    })
   }
 
   const boardStats = [
@@ -347,7 +521,7 @@ export const BoardPage = ({ board }: BoardPageProps) => {
 
     setColumns((current) => moveTask(current, activeId, overId))
 
-    startTransition(() => {
+    startMoveTransition(() => {
       void moveTaskAction({
         boardId: board.id,
         taskId: fromTaskId(activeId),
@@ -381,6 +555,43 @@ export const BoardPage = ({ board }: BoardPageProps) => {
             <p className='max-w-3xl text-sm leading-relaxed text-muted-foreground sm:text-base'>
               {board.description}
             </p>
+          </div>
+          <div className='flex items-center gap-2.5'>
+            <Button
+              size='sm'
+              variant='outline'
+              className='h-8 px-3 sm:h-9 sm:px-3.5'
+              onClick={() => setIsBoardEditOpen(true)}
+            >
+              Edit board
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant='ghost'
+                  size='icon'
+                  className='size-8 rounded-md border border-border/80 text-muted-foreground hover:text-foreground sm:size-9'
+                >
+                  <MoreVertical className='size-4' />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align='start'
+                className='w-48 rounded-xl border border-border bg-popover p-1.5 shadow-md'
+              >
+                <DropdownMenuItem onClick={() => setIsBoardEditOpen(true)}>
+                  Edit board
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className='text-destructive focus:text-destructive'
+                  onClick={handleBoardDelete}
+                >
+                  <Trash2 className='mr-2 size-3.5' />
+                  Delete board
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
           <div className='grid gap-2 sm:grid-cols-3 sm:gap-3'>
             {boardStats.map((stat) => (
@@ -425,6 +636,9 @@ export const BoardPage = ({ board }: BoardPageProps) => {
                   column={column}
                   boardId={board.id}
                   onOpenTask={handleTaskOpen}
+                  onEditTask={handleTaskEdit}
+                  onDeleteTask={handleTaskDelete}
+                  onDuplicateTask={handleTaskDuplicate}
                 />
               ))}
             </div>
@@ -456,6 +670,14 @@ export const BoardPage = ({ board }: BoardPageProps) => {
           router.refresh()
         }}
       />
+      <BoardEditModal
+        boardId={board.id}
+        defaultName={board.name}
+        defaultDescription={board.description}
+        open={isBoardEditOpen}
+        onOpenChange={setIsBoardEditOpen}
+        onSuccess={() => router.refresh()}
+      />
       <TaskCreateModal
         boardId={board.id}
         columns={columns.map((column) => ({
@@ -464,6 +686,17 @@ export const BoardPage = ({ board }: BoardPageProps) => {
         }))}
         open={isTaskCreateOpen}
         onOpenChange={setIsTaskCreateOpen}
+        onSuccess={() => router.refresh()}
+      />
+      <TaskEditModal
+        boardId={board.id}
+        task={editingTask}
+        open={Boolean(editingTaskId)}
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen) {
+            setEditingTaskId(null)
+          }
+        }}
         onSuccess={() => router.refresh()}
       />
       <TaskDetailModal

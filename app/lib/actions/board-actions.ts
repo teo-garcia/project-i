@@ -3,7 +3,11 @@
 import { revalidatePath } from 'next/cache'
 
 import { prisma } from '@/lib/prisma'
-import { boardCreateSchema } from '@/lib/validation/schemas'
+import {
+  boardCreateSchema,
+  boardDeleteSchema,
+  boardUpdateSchema,
+} from '@/lib/validation/schemas'
 import { formatZodErrors } from '@/lib/validation/utils'
 
 type CreateBoardInput = {
@@ -56,13 +60,24 @@ export const updateBoardAction = async ({
   name,
   description,
 }: UpdateBoardInput) => {
+  const parsed = boardUpdateSchema.safeParse({ boardId, name, description })
+
+  if (!parsed.success) {
+    return { ok: false, errors: formatZodErrors(parsed.error) } as const
+  }
+
   await prisma.board.update({
-    where: { id: boardId },
-    data: { name, description },
+    where: { id: parsed.data.boardId },
+    data: {
+      name: parsed.data.name,
+      description: parsed.data.description,
+    },
   })
 
   revalidatePath('/')
-  revalidatePath(`/boards/${boardId}`)
+  revalidatePath(`/boards/${parsed.data.boardId}`)
+
+  return { ok: true } as const
 }
 
 type DeleteBoardInput = {
@@ -70,7 +85,15 @@ type DeleteBoardInput = {
 }
 
 export const deleteBoardAction = async ({ boardId }: DeleteBoardInput) => {
-  await prisma.board.delete({ where: { id: boardId } })
+  const parsed = boardDeleteSchema.safeParse({ boardId })
+
+  if (!parsed.success) {
+    return { ok: false, errors: formatZodErrors(parsed.error) } as const
+  }
+
+  await prisma.board.delete({ where: { id: parsed.data.boardId } })
 
   revalidatePath('/')
+
+  return { ok: true } as const
 }

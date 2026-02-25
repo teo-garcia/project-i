@@ -1,0 +1,105 @@
+'use client'
+
+import { useRouter } from 'next/navigation'
+import { type FormEvent, useState, useTransition } from 'react'
+
+import { Button } from '@/components/ui/button'
+import { updateBoardAction } from '@/lib/actions/board-actions'
+
+type BoardEditFormProps = {
+  boardId: string
+  defaultName: string
+  defaultDescription: string
+  onCancel?: () => void
+  onSuccess?: () => void
+}
+
+export const BoardEditForm = ({
+  boardId,
+  defaultName,
+  defaultDescription,
+  onCancel,
+  onSuccess,
+}: BoardEditFormProps) => {
+  const router = useRouter()
+  const [error, setError] = useState<string | null>(null)
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+  const [isPending, startTransition] = useTransition()
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setError(null)
+    setFieldErrors({})
+
+    const formData = new FormData(event.currentTarget)
+    const name = String(formData.get('name') ?? '').trim()
+    const description = String(formData.get('description') ?? '').trim()
+
+    startTransition(() => {
+      void (async () => {
+        const result = await updateBoardAction({
+          boardId,
+          name,
+          description,
+        })
+
+        if (!result.ok) {
+          setFieldErrors(result.errors)
+          setError(result.errors.form ?? 'Fix the highlighted fields.')
+          return
+        }
+
+        if (onSuccess) {
+          onSuccess()
+          return
+        }
+
+        router.refresh()
+      })()
+    })
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className='space-y-5 sm:space-y-6'>
+      <div className='space-y-1.5 sm:space-y-2'>
+        <label htmlFor='board-name' className='text-sm font-semibold'>
+          Board name
+        </label>
+        <input
+          id='board-name'
+          name='name'
+          defaultValue={defaultName}
+          placeholder='Launch HQ'
+          className='w-full rounded-lg border border-border/80 bg-background px-3 py-2.5 text-sm outline-none transition focus:border-primary/45 focus:ring-2 focus:ring-primary/15 sm:px-3.5'
+        />
+        {fieldErrors.name ? (
+          <p className='text-xs text-destructive'>{fieldErrors.name}</p>
+        ) : null}
+      </div>
+      <div className='space-y-1.5 sm:space-y-2'>
+        <label htmlFor='board-description' className='text-sm font-semibold'>
+          Description
+        </label>
+        <textarea
+          id='board-description'
+          name='description'
+          defaultValue={defaultDescription}
+          rows={3}
+          placeholder='What is this board focused on?'
+          className='w-full resize-none rounded-lg border border-border/80 bg-background px-3 py-2.5 text-sm outline-none transition focus:border-primary/45 focus:ring-2 focus:ring-primary/15 sm:px-3.5'
+        />
+      </div>
+      {error ? <p className='text-sm text-destructive'>{error}</p> : null}
+      <div className='flex flex-wrap gap-3'>
+        <Button type='submit' disabled={isPending} className='min-w-[140px]'>
+          {isPending ? 'Saving...' : 'Save changes'}
+        </Button>
+        {onCancel ? (
+          <Button type='button' variant='ghost' onClick={onCancel}>
+            Cancel
+          </Button>
+        ) : null}
+      </div>
+    </form>
+  )
+}
