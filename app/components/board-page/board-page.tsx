@@ -23,6 +23,7 @@ import {
   Eye,
   ListTodo,
   MoreVertical,
+  Plus,
   Trash2,
 } from 'lucide-react'
 import Link from 'next/link'
@@ -40,7 +41,6 @@ import { BoardCreateModal } from '@/components/board-create-modal/board-create-m
 import { BoardEditModal } from '@/components/board-edit-modal/board-edit-modal'
 import { BoardFilters } from '@/components/board-filters/board-filters'
 import { EmptyState } from '@/components/empty-state/empty-state'
-import { FloatingActionButton } from '@/components/floating-action-button/floating-action-button'
 import { TaskCard } from '@/components/task-card/task-card'
 import { TaskCreateModal } from '@/components/task-create-modal/task-create-modal'
 import { TaskDetailModal } from '@/components/task-detail-modal/task-detail-modal'
@@ -560,7 +560,7 @@ export const BoardPage = ({ board }: BoardPageProps) => {
   }
 
   return (
-    <section className='min-h-screen bg-background px-4 pb-24 pt-8 sm:px-8 sm:pb-14 sm:pt-12'>
+    <section className='min-h-screen bg-background px-4 pb-10 pt-8 sm:px-8 sm:pb-14 sm:pt-12'>
       <div className='app-container flex flex-col gap-6 sm:gap-7'>
         <header className='space-y-4 border-b border-border/70 pb-6 sm:space-y-5 sm:pb-7'>
           <Link
@@ -581,11 +581,20 @@ export const BoardPage = ({ board }: BoardPageProps) => {
           <div className='flex items-center gap-2.5'>
             <Button
               size='sm'
-              variant='outline'
-              className='h-8 px-3 sm:h-9 sm:px-3.5'
-              onClick={() => setIsBoardEditOpen(true)}
+              className='h-8 gap-2 px-3 sm:h-9 sm:px-3.5'
+              onClick={() => setIsTaskCreateOpen(true)}
             >
-              Edit board
+              <Plus className='size-4' />
+              New task
+            </Button>
+            <Button
+              size='sm'
+              variant='outline'
+              className='h-8 gap-2 px-3 sm:h-9 sm:px-3.5'
+              onClick={() => setIsBoardCreateOpen(true)}
+            >
+              <Plus className='size-4' />
+              New board
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -679,11 +688,6 @@ export const BoardPage = ({ board }: BoardPageProps) => {
         </DndContext>
       </div>
 
-      <FloatingActionButton
-        boardId={board.id}
-        onNewTask={() => setIsTaskCreateOpen(true)}
-        onNewBoard={() => setIsBoardCreateOpen(true)}
-      />
       <BoardCreateModal
         open={isBoardCreateOpen}
         onOpenChange={setIsBoardCreateOpen}

@@ -3,10 +3,10 @@
 import { Columns3, LayoutGrid, ListTodo, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 import { BoardCreateModal } from '@/components/board-create-modal/board-create-modal'
 import { BoardSummaryCard } from '@/components/board-summary-card/board-summary-card'
-import { FloatingActionButton } from '@/components/floating-action-button/floating-action-button'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import type { Board } from '@/lib/data/task-board'
@@ -98,12 +98,11 @@ export const BoardsHome = ({ boards }: BoardsHomeProps) => {
         open={isCreateOpen}
         onOpenChange={setIsCreateOpen}
         onSuccess={(boardId) => {
-          setIsCreateOpen(false)
+          toast.success('Board created.')
           router.push(`/boards/${boardId}`)
           router.refresh()
         }}
       />
-      <FloatingActionButton onNewBoard={() => setIsCreateOpen(true)} />
     </section>
   )
 }
