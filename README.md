@@ -141,11 +141,16 @@ Status date: **February 17, 2026**
 - [x] Accessible confirm Dialog replaces `confirm()` for destructive actions
 - [x] DnD optimistic rollback: restores columns and shows toast on persistence
       failure
+- [x] Removed floating action button, replaced with header CTAs
+- [x] Keyboard nav: `aria-label` added to all icon-only buttons (task options,
+      board options, account menu, open navigation)
+- [x] Keyboard nav: `focus-visible` ring added to links missing it (back link,
+      mobile nav link)
+- [x] Keyboard nav: dialog close button uses `focus-visible` instead of `focus`
 
 ### In Progress / Next
 
 - [ ] 11. Polish + accessibility
-- [ ] Improve keyboard navigation and focus states
 - [ ] Contrast and ARIA audit
 
 ### Optional Future

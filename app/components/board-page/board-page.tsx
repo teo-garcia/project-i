@@ -565,7 +565,7 @@ export const BoardPage = ({ board }: BoardPageProps) => {
         <header className='space-y-4 border-b border-border/70 pb-6 sm:space-y-5 sm:pb-7'>
           <Link
             href='/'
-            className='inline-flex w-fit items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground'
+            className='inline-flex w-fit items-center gap-2 rounded-md text-sm text-muted-foreground transition hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60'
           >
             <ArrowLeft className='size-4' />
             Back to boards
@@ -601,6 +601,7 @@ export const BoardPage = ({ board }: BoardPageProps) => {
                 <Button
                   variant='ghost'
                   size='icon'
+                  aria-label='Board options'
                   className='size-8 rounded-md border border-border/80 text-muted-foreground hover:text-foreground sm:size-9'
                 >
                   <MoreVertical className='size-4' />

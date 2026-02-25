@@ -40,6 +40,7 @@ export const AppHeader = () => {
               <Button
                 variant='ghost'
                 size='icon'
+                aria-label='Account menu'
                 className='h-8 w-8 rounded-full border border-transparent hover:border-border sm:h-9 sm:w-9'
               >
                 <Avatar className='size-7 sm:size-8'>

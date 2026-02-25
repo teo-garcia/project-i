@@ -67,12 +67,12 @@ export const TaskCard = ({
   const overdue = isTaskOverdue(task.dueDate)
   const dueSoon = isTaskDueSoon(task.dueDate)
   const description =
-    task.description.trim().length > 0 ? task.description : 'No description yet.'
+    task.description.trim().length > 0
+      ? task.description
+      : 'No description yet.'
 
   const card = (
-    <Card
-      className='relative flex h-[188px] flex-col gap-0 overflow-hidden rounded-xl border border-border/80 bg-card py-0 shadow-[0_1px_0_rgba(15,23,42,0.03)] transition-[border-color,box-shadow] duration-200 before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-primary/20 hover:border-primary/35 hover:shadow-[0_8px_20px_rgba(15,23,42,0.06)] sm:h-[198px]'
-    >
+    <Card className='relative flex h-[188px] flex-col gap-0 overflow-hidden rounded-xl border border-border/80 bg-card py-0 shadow-[0_1px_0_rgba(15,23,42,0.03)] transition-[border-color,box-shadow] duration-200 before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-primary/20 hover:border-primary/35 hover:shadow-[0_8px_20px_rgba(15,23,42,0.06)] sm:h-[198px]'>
       <CardContent className='flex flex-1 flex-col p-2.5 sm:p-3'>
         <div className='mb-2 flex items-center justify-between gap-2'>
           <div className='inline-flex items-center gap-1.5'>
@@ -95,6 +95,7 @@ export const TaskCard = ({
                 <Button
                   variant='ghost'
                   size='icon'
+                  aria-label='Task options'
                   className='size-6 rounded-md text-muted-foreground/85 hover:text-foreground sm:size-7'
                   onClick={(e) => {
                     e.preventDefault()

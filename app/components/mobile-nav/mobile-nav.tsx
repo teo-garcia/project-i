@@ -17,7 +17,12 @@ export const MobileNav = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant='outline' size='icon' className='rounded-full border-border/60'>
+        <Button
+          variant='outline'
+          size='icon'
+          aria-label='Open navigation'
+          className='rounded-full border-border/60'
+        >
           <Menu className='size-4' />
         </Button>
       </DialogTrigger>
@@ -36,7 +41,7 @@ export const MobileNav = () => {
         <nav className='mt-6 flex flex-col gap-2 text-sm font-medium'>
           <Link
             href='/'
-            className='flex items-center gap-3 rounded-2xl border border-transparent px-4 py-2.5 text-foreground transition hover:border-primary/40 hover:bg-primary/10'
+            className='flex items-center gap-3 rounded-2xl border border-transparent px-4 py-2.5 text-foreground transition hover:border-primary/40 hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60'
           >
             <LayoutGrid className='size-4' />
             Boards
