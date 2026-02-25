@@ -2,8 +2,9 @@
 
 import { QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { ThemeProvider } from 'next-themes'
+import { ThemeProvider, useTheme } from 'next-themes'
 import { useEffect } from 'react'
+import { Toaster } from 'sonner'
 
 import { ViewportInfo } from '@/components/viewport-info/viewport-info'
 import { createNewQueryClient } from '@/lib/misc/react-query'
@@ -27,9 +28,18 @@ export const GlobalProviders = (properties: React.PropsWithChildren) => {
   )
 }
 
-const ThemeProviderContent = ({ children }: React.PropsWithChildren) => (
-  <>
-    {children}
-    <ViewportInfo />
-  </>
-)
+const ThemeProviderContent = ({ children }: React.PropsWithChildren) => {
+  const { resolvedTheme } = useTheme()
+  return (
+    <>
+      {children}
+      <ViewportInfo />
+      <Toaster
+        theme={resolvedTheme as 'light' | 'dark' | 'system'}
+        richColors
+        closeButton
+        position='bottom-right'
+      />
+    </>
+  )
+}

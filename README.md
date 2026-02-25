@@ -135,18 +135,18 @@ Status date: **February 17, 2026**
 - [x] Task and board update/delete flows wired from UI to server actions
 - [x] Update/delete input validation added with field-level error returns
 - [x] Drag-and-drop resequencing fixed to use transaction client consistently
+- [x] Toast infrastructure wired (sonner, next-themes integration)
+- [x] Success toasts on task/board create, update, delete, and duplicate
+- [x] Error toasts replace all `alert()` calls for action failures
+- [x] Accessible confirm Dialog replaces `confirm()` for destructive actions
+- [x] DnD optimistic rollback: restores columns and shows toast on persistence
+      failure
 
 ### In Progress / Next
 
 - [ ] 11. Polish + accessibility
-- [ ] Add toast feedback for create/update/delete success and failure states
-- [ ] Replace `alert`/`confirm` destructive flows with accessible dialogs +
-      toast confirmations
 - [ ] Improve keyboard navigation and focus states
 - [ ] Contrast and ARIA audit
-- [ ] 6b) Harden optimistic DnD reliability
-- [ ] Add rollback behavior when DnD persistence fails
-- [ ] Show user-facing toast errors when task move persistence fails
 
 ### Optional Future
 

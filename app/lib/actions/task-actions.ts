@@ -37,12 +37,14 @@ const resequenceColumn = async (
   )
 }
 
+type MoveTaskResult = { ok: true } | { ok: false; message: string }
+
 export const moveTaskAction = async ({
   boardId,
   taskId,
   toColumnId,
   toIndex,
-}: MoveTaskInput) => {
+}: MoveTaskInput): Promise<MoveTaskResult> => {
   const parsed = taskMoveSchema.safeParse({
     boardId,
     taskId,
@@ -51,57 +53,62 @@ export const moveTaskAction = async ({
   })
 
   if (!parsed.success) {
-    return
+    return { ok: false, message: 'Invalid move parameters.' }
   }
 
-  await prisma.$transaction(async (tx) => {
-    const task = await tx.task.findUnique({
-      where: { id: taskId },
-      select: { columnId: true },
+  try {
+    await prisma.$transaction(async (tx) => {
+      const task = await tx.task.findUnique({
+        where: { id: taskId },
+        select: { columnId: true },
+      })
+
+      if (!task) {
+        return
+      }
+
+      const sourceColumnId = task.columnId
+      const sourceTasks = await tx.task.findMany({
+        where: { columnId: sourceColumnId },
+        orderBy: { order: 'asc' },
+        select: { id: true },
+      })
+
+      const targetTasks =
+        sourceColumnId === toColumnId
+          ? sourceTasks
+          : await tx.task.findMany({
+              where: { columnId: toColumnId },
+              orderBy: { order: 'asc' },
+              select: { id: true },
+            })
+
+      const sourceIds = sourceTasks
+        .map((item) => item.id)
+        .filter((id) => id !== taskId)
+      const targetIds =
+        sourceColumnId === toColumnId
+          ? sourceIds
+          : targetTasks.map((item) => item.id)
+
+      const clampedIndex = Math.max(0, Math.min(toIndex, targetIds.length))
+      targetIds.splice(clampedIndex, 0, taskId)
+
+      if (sourceColumnId === toColumnId) {
+        await resequenceColumn(targetIds, toColumnId, false, tx)
+        return
+      }
+
+      await resequenceColumn(sourceIds, sourceColumnId, false, tx)
+      await resequenceColumn(targetIds, toColumnId, true, tx)
     })
-
-    if (!task) {
-      return
-    }
-
-    const sourceColumnId = task.columnId
-    const sourceTasks = await tx.task.findMany({
-      where: { columnId: sourceColumnId },
-      orderBy: { order: 'asc' },
-      select: { id: true },
-    })
-
-    const targetTasks =
-      sourceColumnId === toColumnId
-        ? sourceTasks
-        : await tx.task.findMany({
-            where: { columnId: toColumnId },
-            orderBy: { order: 'asc' },
-            select: { id: true },
-          })
-
-    const sourceIds = sourceTasks
-      .map((item) => item.id)
-      .filter((id) => id !== taskId)
-    const targetIds =
-      sourceColumnId === toColumnId
-        ? sourceIds
-        : targetTasks.map((item) => item.id)
-
-    const clampedIndex = Math.max(0, Math.min(toIndex, targetIds.length))
-    targetIds.splice(clampedIndex, 0, taskId)
-
-    if (sourceColumnId === toColumnId) {
-      await resequenceColumn(targetIds, toColumnId, false, tx)
-      return
-    }
-
-    await resequenceColumn(sourceIds, sourceColumnId, false, tx)
-    await resequenceColumn(targetIds, toColumnId, true, tx)
-  })
+  } catch {
+    return { ok: false, message: 'Failed to save task position.' }
+  }
 
   revalidatePath(`/boards/${boardId}`)
   revalidatePath(`/boards/${boardId}/task/${taskId}`)
+  return { ok: true }
 }
 
 type CreateTaskInput = {

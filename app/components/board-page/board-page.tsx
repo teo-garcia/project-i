@@ -34,6 +34,7 @@ import {
   useState,
   useTransition,
 } from 'react'
+import { toast } from 'sonner'
 
 import { BoardCreateModal } from '@/components/board-create-modal/board-create-modal'
 import { BoardEditModal } from '@/components/board-edit-modal/board-edit-modal'
@@ -46,6 +47,14 @@ import { TaskDetailModal } from '@/components/task-detail-modal/task-detail-moda
 import { TaskEditModal } from '@/components/task-edit-modal/task-edit-modal'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -79,6 +88,12 @@ import { cn } from '@/lib/utils'
 
 type BoardPageProps = {
   board: Board
+}
+
+type PendingConfirm = {
+  title: string
+  description: string
+  onConfirm: () => void
 }
 
 type SortableTaskCardProps = {
@@ -318,6 +333,9 @@ export const BoardPage = ({ board }: BoardPageProps) => {
   const [isTaskCreateOpen, setIsTaskCreateOpen] = useState(false)
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null)
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
+  const [pendingConfirm, setPendingConfirm] = useState<PendingConfirm | null>(
+    null
+  )
   const [, startMoveTransition] = useTransition()
   const [, startTaskMutationTransition] = useTransition()
   const [, startBoardMutationTransition] = useTransition()
@@ -390,27 +408,26 @@ export const BoardPage = ({ board }: BoardPageProps) => {
     })
 
     if (!result.ok) {
-      globalThis.alert(result.errors.form ?? 'Unable to delete task.')
+      toast.error(result.errors.form ?? 'Unable to delete task.')
       return
     }
 
     setColumns((current) => removeTaskFromColumns(current, task.id))
     setSelectedTaskId((current) => (current === task.id ? null : current))
     setEditingTaskId((current) => (current === task.id ? null : current))
+    toast.success('Task deleted.')
     router.refresh()
   }
 
   const handleTaskDelete = (task: Task) => {
-    const shouldDelete = globalThis.confirm(
-      `Delete "${task.title}"? This action cannot be undone.`
-    )
-
-    if (!shouldDelete) {
-      return
-    }
-
-    startTaskMutationTransition(() => {
-      void runTaskDelete(task)
+    setPendingConfirm({
+      title: 'Delete task',
+      description: `Delete "${task.title}"? This action cannot be undone.`,
+      onConfirm: () => {
+        startTaskMutationTransition(() => {
+          void runTaskDelete(task)
+        })
+      },
     })
   }
 
@@ -430,10 +447,11 @@ export const BoardPage = ({ board }: BoardPageProps) => {
     })
 
     if (!result.ok) {
-      globalThis.alert(result.errors.form ?? 'Unable to duplicate task.')
+      toast.error(result.errors.form ?? 'Unable to duplicate task.')
       return
     }
 
+    toast.success('Task duplicated.')
     router.refresh()
   }
 
@@ -441,7 +459,7 @@ export const BoardPage = ({ board }: BoardPageProps) => {
     const sourceColumn = getTaskColumn(task.id)
 
     if (!sourceColumn) {
-      globalThis.alert('Unable to find source column for duplication.')
+      toast.error('Unable to find source column for duplication.')
       return
     }
 
@@ -454,7 +472,7 @@ export const BoardPage = ({ board }: BoardPageProps) => {
     const result = await deleteBoardAction({ boardId: board.id })
 
     if (!result.ok) {
-      globalThis.alert(result.errors.form ?? 'Unable to delete board.')
+      toast.error(result.errors.form ?? 'Unable to delete board.')
       return
     }
 
@@ -463,16 +481,14 @@ export const BoardPage = ({ board }: BoardPageProps) => {
   }
 
   const handleBoardDelete = () => {
-    const shouldDelete = globalThis.confirm(
-      `Delete board "${board.name}" and all of its tasks?`
-    )
-
-    if (!shouldDelete) {
-      return
-    }
-
-    startBoardMutationTransition(() => {
-      void runBoardDelete()
+    setPendingConfirm({
+      title: 'Delete board',
+      description: `Delete board "${board.name}" and all of its tasks? This cannot be undone.`,
+      onConfirm: () => {
+        startBoardMutationTransition(() => {
+          void runBoardDelete()
+        })
+      },
     })
   }
 
@@ -519,15 +535,21 @@ export const BoardPage = ({ board }: BoardPageProps) => {
       ? targetColumn.tasks.findIndex((task) => task.id === target.taskId)
       : targetColumn.tasks.length
 
+    const prevColumns = columns
     setColumns((current) => moveTask(current, activeId, overId))
 
-    startMoveTransition(() => {
-      void moveTaskAction({
+    startMoveTransition(async () => {
+      const result = await moveTaskAction({
         boardId: board.id,
         taskId: fromTaskId(activeId),
         toColumnId: targetColumn.id,
         toIndex: targetIndex === -1 ? targetColumn.tasks.length : targetIndex,
       })
+
+      if (!result.ok) {
+        setColumns(prevColumns)
+        toast.error(result.message)
+      }
     })
 
     setActiveTaskId(null)
@@ -666,6 +688,7 @@ export const BoardPage = ({ board }: BoardPageProps) => {
         open={isBoardCreateOpen}
         onOpenChange={setIsBoardCreateOpen}
         onSuccess={(boardId) => {
+          toast.success('Board created.')
           router.push(`/boards/${boardId}`)
           router.refresh()
         }}
@@ -676,7 +699,10 @@ export const BoardPage = ({ board }: BoardPageProps) => {
         defaultDescription={board.description}
         open={isBoardEditOpen}
         onOpenChange={setIsBoardEditOpen}
-        onSuccess={() => router.refresh()}
+        onSuccess={() => {
+          toast.success('Board updated.')
+          router.refresh()
+        }}
       />
       <TaskCreateModal
         boardId={board.id}
@@ -686,7 +712,10 @@ export const BoardPage = ({ board }: BoardPageProps) => {
         }))}
         open={isTaskCreateOpen}
         onOpenChange={setIsTaskCreateOpen}
-        onSuccess={() => router.refresh()}
+        onSuccess={() => {
+          toast.success('Task created.')
+          router.refresh()
+        }}
       />
       <TaskEditModal
         boardId={board.id}
@@ -697,7 +726,10 @@ export const BoardPage = ({ board }: BoardPageProps) => {
             setEditingTaskId(null)
           }
         }}
-        onSuccess={() => router.refresh()}
+        onSuccess={() => {
+          toast.success('Task updated.')
+          router.refresh()
+        }}
       />
       <TaskDetailModal
         task={selectedTask}
@@ -710,6 +742,33 @@ export const BoardPage = ({ board }: BoardPageProps) => {
           }
         }}
       />
+      <Dialog
+        open={Boolean(pendingConfirm)}
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen) setPendingConfirm(null)
+        }}
+      >
+        <DialogContent showCloseButton={false}>
+          <DialogHeader>
+            <DialogTitle>{pendingConfirm?.title}</DialogTitle>
+            <DialogDescription>{pendingConfirm?.description}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant='outline' onClick={() => setPendingConfirm(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant='destructive'
+              onClick={() => {
+                pendingConfirm?.onConfirm()
+                setPendingConfirm(null)
+              }}
+            >
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </section>
   )
 }
