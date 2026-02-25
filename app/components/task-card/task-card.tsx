@@ -237,6 +237,7 @@ export const TaskCard = ({
     content = (
       <button
         type='button'
+        aria-label={`Open ${task.title}`}
         onClick={onOpen}
         className='block w-full rounded-xl text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60'
       >
@@ -247,6 +248,7 @@ export const TaskCard = ({
     content = (
       <Link
         href={`/boards/${boardId}/task/${task.id}`}
+        aria-label={`Open ${task.title}`}
         className='block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60'
       >
         {card}

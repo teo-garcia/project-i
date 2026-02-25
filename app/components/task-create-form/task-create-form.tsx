@@ -7,7 +7,11 @@ import { type FormEvent, useState, useTransition } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import { createTaskAction } from '@/lib/actions/task-actions'
 import type { TaskPriority } from '@/lib/data/task-board'
 
@@ -179,12 +183,22 @@ export const TaskCreateForm = ({
         <label htmlFor='task-due-date' className='text-sm font-semibold'>
           Due date
         </label>
-        <input id='task-due-date' name='dueDate' type='hidden' value={dueDateValue} />
+        <input
+          id='task-due-date'
+          name='dueDate'
+          type='hidden'
+          value={dueDateValue}
+        />
         <Popover>
           <PopoverTrigger asChild>
             <Button
               type='button'
               variant='outline'
+              aria-label={
+                dueDateValue
+                  ? `Due date: ${format(new Date(dueDateValue + 'T00:00:00'), 'PPP')}`
+                  : 'Select due date'
+              }
               className='h-10 w-full justify-start rounded-lg border-border/80 bg-background px-3 text-left text-sm font-normal hover:bg-accent/40'
             >
               <CalendarDays className='mr-2 size-4 text-primary' />

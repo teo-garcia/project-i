@@ -147,11 +147,14 @@ Status date: **February 17, 2026**
 - [x] Keyboard nav: `focus-visible` ring added to links missing it (back link,
       mobile nav link)
 - [x] Keyboard nav: dialog close button uses `focus-visible` instead of `focus`
+- [x] ARIA: drop placeholders marked `aria-hidden`
+- [x] ARIA: Kanban columns annotated with `role="group"` and `aria-label`
+- [x] ARIA: task card interactive wrappers have `aria-label` with task title
+- [x] ARIA: due date Popover trigger has dynamic `aria-label`
 
-### In Progress / Next
+### Completed
 
-- [ ] 11. Polish + accessibility
-- [ ] Contrast and ARIA audit
+- [x] 11. Polish + accessibility
 
 ### Optional Future
 

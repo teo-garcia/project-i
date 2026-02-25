@@ -211,6 +211,7 @@ const buildColumnItems = (
   const placeholderNode = (
     <div
       key='drop-placeholder'
+      aria-hidden='true'
       className='h-[188px] rounded-xl border border-dashed border-foreground/25 bg-muted/40 sm:h-[198px]'
     />
   )
@@ -239,6 +240,7 @@ const buildColumnItems = (
     items.push(
       <div
         key='drop-placeholder-end'
+        aria-hidden='true'
         className='h-[188px] rounded-xl border border-dashed border-foreground/25 bg-muted/40 sm:h-[198px]'
       />
     )
@@ -283,7 +285,11 @@ const ColumnSection = ({
   )
 
   return (
-    <div className='flex flex-col gap-2.5 sm:gap-3'>
+    <div
+      role='group'
+      aria-label={column.name}
+      className='flex flex-col gap-2.5 sm:gap-3'
+    >
       <div className='flex items-center justify-between rounded-xl border border-border/80 bg-card px-3.5 py-2 sm:px-4 sm:py-2.5'>
         <h2 className='text-base font-semibold tracking-tight sm:text-[1.02rem]'>
           {column.name}
