@@ -113,62 +113,49 @@ Open your local app URL (from `.env`) in the browser.
 | `pnpm lint:ts`       | TypeScript check      |
 | `pnpm test -- --run` | Run tests             |
 
-## Implementation Plan And Progress
+## Implementation Plan
 
-Status date: **February 17, 2026**
+Status date: **February 25, 2026**
 
-### Completed
+### Phase 1: Foundation
 
 - [x] 1. Base UI primitives (shadcn/ui)
 - [x] 2. App Router routes + layouts
 - [x] 3. Kanban UI + task detail modal
 - [x] 4. Filters + theme integration
 - [x] 5. Business logic in `app/lib`
+
+### Phase 2: Data + Actions
+
 - [x] 6. Drag-and-drop + optimistic UI
 - [x] 7. Prisma schema + SQLite wiring
 - [x] 8. Server Actions for CRUD
 - [x] 9. Zod validation for inputs
 - [x] 10. Wire update/delete flows in UI
 
-### Recent Delivered Changes
+### Phase 3: Polish + Accessibility
 
-- [x] Task and board update/delete flows wired from UI to server actions
-- [x] Update/delete input validation added with field-level error returns
-- [x] Drag-and-drop resequencing fixed to use transaction client consistently
-- [x] Toast infrastructure wired (sonner, next-themes integration)
-- [x] Success toasts on task/board create, update, delete, and duplicate
-- [x] Error toasts replace all `alert()` calls for action failures
-- [x] Accessible confirm Dialog replaces `confirm()` for destructive actions
-- [x] DnD optimistic rollback: restores columns and shows toast on persistence
-      failure
-- [x] Removed floating action button, replaced with header CTAs
-- [x] Keyboard nav: `aria-label` added to all icon-only buttons (task options,
-      board options, account menu, open navigation)
-- [x] Keyboard nav: `focus-visible` ring added to links missing it (back link,
-      mobile nav link)
-- [x] Keyboard nav: dialog close button uses `focus-visible` instead of `focus`
-- [x] ARIA: drop placeholders marked `aria-hidden`
-- [x] ARIA: Kanban columns annotated with `role="group"` and `aria-label`
-- [x] ARIA: task card interactive wrappers have `aria-label` with task title
-- [x] ARIA: due date Popover trigger has dynamic `aria-label`
+- [x] 11. Toast feedback for all CRUD success and error states
+- [x] 11. Accessible confirm dialog replacing native `confirm()`
+- [x] 11. DnD optimistic rollback with toast on persistence failure
+- [x] 11. Header CTAs replacing floating action button
+- [x] 11. `aria-label` on all icon-only buttons
+- [x] 11. `focus-visible` rings on all interactive links
+- [x] 11. ARIA roles and labels on Kanban columns and task cards
+- [x] 11. `aria-hidden` on decorative drop placeholders
 
-### Completed
-
-- [x] 11. Polish + accessibility
-
-### Optional Future
-
-- [ ] 12. Sharing + real-time ordering
-- [ ] Multi-user board viewing
-- [ ] Real-time ordering updates
-
-### Deferred Quality Track
+### Phase 4: Quality Track
 
 - [ ] Fix Vitest 4 browser provider config migration (`browser.provider`
       factory)
-- [ ] Add unit tests for server actions and board/task interaction helpers
-- [ ] Add interaction tests for toast flows (success/error) across CRUD actions
-- [ ] Add interaction tests for optimistic DnD rollback and failure feedback
+- [ ] Unit tests for server actions and board/task interaction helpers
+- [ ] Interaction tests for toast flows (success/error) across CRUD actions
+- [ ] Interaction tests for optimistic DnD rollback and failure feedback
+
+### Phase 5: Optional Future
+
+- [ ] 12. Multi-user board viewing
+- [ ] 12. Real-time ordering updates
 
 ## Project Structure
 
